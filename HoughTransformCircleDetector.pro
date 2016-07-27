@@ -1,12 +1,9 @@
-HEADERS       = \
-                window.hpp
+HEADERS       = window.hpp
 
-SOURCES       = \
-                main.cpp \
+SOURCES       = main.cpp \
                 window.cpp
 QT += core gui opengl widgets
-LIBS += -lglu32 -lopengl32
-RESOURCES += resources.qrc
+#RESOURCES += resources.qrc
 #QMAKE_CXXFLAGS += -DSHOULD_LOAD_SHADERS -std=c++11
 QMAKE_CXXFLAGS += -std=c++11
 # install
@@ -16,10 +13,10 @@ win32 {
 # Unsupported, do it yourself.
 }
 macx {
-copydata.commands = cp -r $$PWD/models $$OUT_PWD
+# copydata.commands = cp -r $$PWD/models $$OUT_PWD
 }
 unix {
-copydata.commands = cp -r $$PWD/models $$OUT_PWD
+# copydata.commands = cp -r $$PWD/models $$OUT_PWD
 }
 first.depends = $(first) copydata
 export(first.depends)
