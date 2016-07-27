@@ -1,6 +1,7 @@
-platform=$(shell uname -o)
+EXEC_ARGS = gui
 
 all:
+	echo $(EXEC_ARGS)
 	qmake -o Makefile.run HoughTransformCircleDetector.pro
 	make -f Makefile.run
 	rm Makefile.run*
