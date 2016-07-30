@@ -1,23 +1,34 @@
-// Copyright[2015] <Brian Mc George>
+// Copyright[2016] <Brian Mc George>
 // MCGBRI004
 
 #include <QGLFormat>
 #include <QAction>
+#include <iostream>
 #include <QMenuBar>
 #include <QFileDialog>
+#include <QLabel>
+#include <QScrollArea>
 #include <string>
 #include "./window.hpp"
+#include "./CImg.h"
 
-window::window(QWidget *parent) : QMainWindow(parent) {
+window::window(QWidget *parent) : QMainWindow(parent), imageLabel(new QLabel), imageScrollArea(new QScrollArea), currentImageSelection(0) {
     setUpWidget();
     addActions();
     addMenus();
     addConections();
 }
 
-window::~window() {
-    delete newAction;
+window::~window() { 
     delete openAction;
+    delete saveAction;
+    delete inputImageAction;
+    delete smoothedImageAction;
+    delete edgeDetectionImageAction;
+    delete circleDetectionImageAction;
+    delete imageLabel;
+    delete imageScrollArea;
+    delete imageMenu;
     delete fileMenu;
     for (unsigned int i =0; i < windows.size(); ++i) {
         delete windows[i];
@@ -26,42 +37,115 @@ window::~window() {
 
 void window::setUpWidget() {
 
+    imageLabel->setBackgroundRole(QPalette::Base);
+    imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    imageLabel->setScaledContents(true);
+    imageLabel->setBackgroundRole(QPalette::Dark);
+    imageScrollArea->setWidget(imageLabel);
+
+    setCentralWidget(imageScrollArea);
+    open();
+    imageScrollArea->setVisible(true);
 }
 
 void window::addActions() {
-    openAction = new QAction(tr("O&pen"), this);
-    openAction->setStatusTip(tr("Opens a stl file"));
-    newAction = new QAction(tr("N&ew"), this);
-    newAction->setStatusTip(tr("Open new window"));
-    resetAction = new QAction(tr("R&eset"), this);
-    resetAction->setStatusTip(tr("Resets the scene"));
+    openAction = new QAction(tr("O&pen image"), this);
+    openAction->setStatusTip(tr("Opens an image"));
+    saveAction = new QAction(tr("S&ave image"), this);
+    saveAction->setStatusTip(tr("Saves an image"));
+    inputImageAction = new QAction(tr("I&nput Image"), this);
+    inputImageAction->setStatusTip(tr("Sets image to input image"));
+    smoothedImageAction = new QAction(tr("S&moothed Image"), this);
+    smoothedImageAction->setStatusTip(tr("Sets image to the smoothed image"));
+    edgeDetectionImageAction = new QAction(tr("E&dge Detection Image"), this);
+    edgeDetectionImageAction->setStatusTip(tr("Sets image to the edge detection image"));
+    circleDetectionImageAction = new QAction(tr("C&ircle Detection Image"), this);
+    circleDetectionImageAction->setStatusTip(tr("Sets image to the circle detection image"));
 }
 
 void window::addMenus() {
     fileMenu = menuBar()->addMenu(tr("&File"));
-    fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
-    fileMenu->addAction(resetAction);
+    fileMenu->addAction(saveAction);
+    imageMenu = menuBar()->addMenu(tr("&Pick Image"));
+    imageMenu->addAction(inputImageAction);
+    imageMenu->addAction(smoothedImageAction);
+    imageMenu->addAction(edgeDetectionImageAction);
+    imageMenu->addAction(circleDetectionImageAction);
 }
 
 void window::addConections() {
-    connect(newAction, SIGNAL(triggered()), this, SLOT(newWindow()));
     connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
-    connect(resetAction, SIGNAL(triggered()), this, SLOT(reset()));
+    connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
+    connect(inputImageAction, SIGNAL(triggered()), this, SLOT(selectInputImage()));
+    connect(smoothedImageAction, SIGNAL(triggered()), this, SLOT(selectSmoothedImage()));
+    connect(edgeDetectionImageAction, SIGNAL(triggered()), this, SLOT(selectEdgeDetectionImage()));
+    connect(circleDetectionImageAction, SIGNAL(triggered()), this, SLOT(selectCircleDetectionImage()));
 }
 
 void window::open() {
-    QString fileName = QFileDialog::getOpenFileName(this, tr("Open stl file"), "", tr("*.obj"));
+    // Override filename to make testing quicker
+    QString fileName = "images/testseq100000.pgm";
+    QPixmap originalPixmap(fileName);
+
+    inputImage = originalPixmap.toImage();
+    int width = inputImage.width();
+    int height = inputImage.height();
+    int *matrix = new int [width*height];
+
+    for(int j = 0; j < height; j++)
+    {
+      for(int i = 0; i < width; i++)
+      {
+        matrix[j*width+i] = qGray(inputImage.pixel(i,j));
+      }
+    }
+
+    QImage modifiedImage(width, height, QImage::Format_RGB32);
+    for(int j = 0; j < height; j++)
+    {
+      for(int i = 0; i < width; i++)
+      {
+        modifiedImage.setPixel(i, j, qRgb(matrix[j*width+i], matrix[j*width+i], matrix[j*width+i]));
+      }
+    }
+
+    QPixmap modifiedPixmap = QPixmap::fromImage(modifiedImage);
+
+    imageLabel->setPixmap(modifiedPixmap);
+    imageLabel->resize(imageLabel->pixmap()->size());
+
+    // QString defaultFilter = "Netpbm (*.pgm *.ppm *.pbm)";
+    // QString fileName = QFileDialog::getOpenFileName(this, tr("Open image file"), "", tr("Netpbm (*.pgm *.ppm *.pbm);;GIF (*.gif);;JPEG (*.jpeg *.jpg)"), &defaultFilter);
     if (fileName != "") {
 
     }
 }
 
-void window::newWindow() {
-    windows.push_back(new window());
-    windows.back()->resize(640, 480);
-    windows.back()->show();
+void window::save() {
+    QString defaultFilter = "Netpbm (*.pgm *.ppm *.pbm)";
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Open image file"), "image.pgm", tr("Netpbm (*.pgm *.ppm *.pbm);;GIF (*.gif);;JPEG (*.jpg *.jpeg)"), &defaultFilter);
+    QString ext = QFileInfo(fileName).suffix();
+    imageLabel->pixmap()->save(fileName, ext.toStdString().c_str());
 }
 
-void window::reset() {
+void window::selectInputImage() {
+    QPixmap modifiedPixmap = QPixmap::fromImage(inputImage);
+    imageLabel->setPixmap(modifiedPixmap);
+    imageLabel->resize(imageLabel->pixmap()->size());
 }
+
+void window::selectSmoothedImage() {
+    QPixmap modifiedPixmap = QPixmap::fromImage(smoothedImage);
+    imageLabel->setPixmap(modifiedPixmap);
+    imageLabel->resize(imageLabel->pixmap()->size());
+}
+
+void window::selectEdgeDetectionImage() {
+
+}
+
+void window::selectCircleDetectionImage() {
+
+}
+

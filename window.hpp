@@ -11,6 +11,8 @@
 class GLWidget;
 class QAction;
 class QMenu;
+class QLabel;
+class QScrollArea;
 
 class window : public QMainWindow {
   Q_OBJECT
@@ -20,19 +22,34 @@ class window : public QMainWindow {
 
  private slots:
   void open();
-  void newWindow();
-  void reset();
+  void save();
+  void selectInputImage();
+  void selectSmoothedImage();
+  void selectEdgeDetectionImage();
+  void selectCircleDetectionImage();
 
  private:
   void addActions();
   void addMenus();
   void addConections();
   void setUpWidget();
+  int currentImageSelection;
   QMenu *fileMenu;
-  QAction *newAction;
+  QMenu *imageMenu;
   QAction *openAction;
-  QAction *resetAction;
+  QAction *saveAction;
+  QAction *inputImageAction;
+  QAction *smoothedImageAction;
+  QAction *edgeDetectionImageAction;
+  QAction *circleDetectionImageAction;
   GLWidget *glWidget;
+  QImage inputImage;
+  QImage smoothedImage;
+  QImage edgeDetectionImage;
+  QImage circleDetectionImage;
+  QLabel *imageLabel;
+  QScrollArea *imageScrollArea;
+  double scaleFactor;
   std::vector<window *> windows;
 };
 
