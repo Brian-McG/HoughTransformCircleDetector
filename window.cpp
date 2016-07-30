@@ -10,7 +10,6 @@
 #include <QScrollArea>
 #include <string>
 #include "./window.hpp"
-#include "./CImg.h"
 
 window::window(QWidget *parent) : QMainWindow(parent), imageLabel(new QLabel), imageScrollArea(new QScrollArea), currentImageSelection(0) {
     setUpWidget();
@@ -124,8 +123,22 @@ void window::open() {
 
 void window::save() {
     QString defaultFilter = "Netpbm (*.pgm *.ppm *.pbm)";
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Open image file"), "image.pgm", tr("Netpbm (*.pgm *.ppm *.pbm);;GIF (*.gif);;JPEG (*.jpg *.jpeg)"), &defaultFilter);
+    std::string baseName = "_image";
+    std::string baseExt = ".pgm";
+
+    if (currentImageSelection == 0) {
+        baseName = "input" + baseName;
+    } else if (currentImageSelection == 1) {
+        baseName = "smoothed" + baseName;
+    } else if (currentImageSelection == 2) {
+        baseName = "edge_detection" + baseName;
+    } else {
+        baseName = "circle_detection" + baseName;
+    }
+
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Open image file"), (baseName+baseExt).c_str(), tr("Netpbm (*.pgm *.ppm *.pbm);;GIF (*.gif);;JPEG (*.jpg *.jpeg)"), &defaultFilter);
     QString ext = QFileInfo(fileName).suffix();
+
     imageLabel->pixmap()->save(fileName, ext.toStdString().c_str());
 }
 
@@ -133,19 +146,29 @@ void window::selectInputImage() {
     QPixmap modifiedPixmap = QPixmap::fromImage(inputImage);
     imageLabel->setPixmap(modifiedPixmap);
     imageLabel->resize(imageLabel->pixmap()->size());
+    currentImageSelection = 0;
 }
 
 void window::selectSmoothedImage() {
     QPixmap modifiedPixmap = QPixmap::fromImage(smoothedImage);
     imageLabel->setPixmap(modifiedPixmap);
     imageLabel->resize(imageLabel->pixmap()->size());
+    currentImageSelection = 1;
 }
 
 void window::selectEdgeDetectionImage() {
+    QPixmap modifiedPixmap = QPixmap::fromImage(edgeDetectionImage);
+    imageLabel->setPixmap(modifiedPixmap);
+    imageLabel->resize(imageLabel->pixmap()->size());
+    currentImageSelection = 2;
 
 }
 
 void window::selectCircleDetectionImage() {
+    QPixmap modifiedPixmap = QPixmap::fromImage(circleDetectionImage);
+    imageLabel->setPixmap(modifiedPixmap);
+    imageLabel->resize(imageLabel->pixmap()->size());
+    currentImageSelection = 3;
 
 }
 
