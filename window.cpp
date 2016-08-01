@@ -1,7 +1,6 @@
 // Copyright[2016] <Brian Mc George>
 // MCGBRI004
 
-#include <QGLFormat>
 #include <QAction>
 #include <iostream>
 #include <QMenuBar>

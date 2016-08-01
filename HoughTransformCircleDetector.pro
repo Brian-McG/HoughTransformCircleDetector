@@ -1,7 +1,10 @@
-HEADERS       = window.hpp
+HEADERS       = \
+    gaussianblur.hpp \
+    window.hpp
 
 SOURCES       = main.cpp \
-                window.cpp
+                window.cpp \
+    gaussianblur.cpp
 QT += core gui opengl widgets
 #RESOURCES += resources.qrc
 #QMAKE_CXXFLAGS += -DSHOULD_LOAD_SHADERS -std=c++11
