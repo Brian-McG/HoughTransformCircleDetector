@@ -3,6 +3,7 @@
 
 #include <QApplication>
 #include "window.hpp"
+#include "gaussianblur.hpp"
 
 int main(int argc, char* argv[]) {
     QApplication a(argc, argv);

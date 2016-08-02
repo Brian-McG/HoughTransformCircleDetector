@@ -1,4 +1,5 @@
-// Copyright [2015] <Brian Mc George>
+// Brian Mc George
+// MCGBRI004
 
 #ifndef WINDOW_H_
 #define WINDOW_H_

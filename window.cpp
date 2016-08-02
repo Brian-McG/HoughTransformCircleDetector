@@ -1,4 +1,4 @@
-// Copyright[2016] <Brian Mc George>
+// Brian Mc George
 // MCGBRI004
 
 #include <QAction>
@@ -9,6 +9,8 @@
 #include <QScrollArea>
 #include <string>
 #include "./window.hpp"
+#include "./gaussianblur.hpp"
+#include "./edgedetection.hpp"
 
 window::window(QWidget *parent) : QMainWindow(parent), imageLabel(new QLabel), imageScrollArea(new QScrollArea), currentImageSelection(0) {
     setUpWidget();
@@ -112,6 +114,29 @@ void window::open() {
 
     imageLabel->setPixmap(modifiedPixmap);
     imageLabel->resize(imageLabel->pixmap()->size());
+
+    int* blurredMatrix = mcgbri004::applyGausianBlur(matrix, width, height, 1.4, 5);
+    smoothedImage = QImage(width, height, QImage::Format_RGB32);
+    for(int j = 0; j < height; j++)
+    {
+      for(int i = 0; i < width; i++)
+      {
+            smoothedImage.setPixel(i, j, qRgb(blurredMatrix[j*width+i], blurredMatrix[j*width+i], blurredMatrix[j*width+i]));
+      }
+    }
+
+    int* edgeMatrix =  mcgbri004::applyEdgeDetection(blurredMatrix, width, height);
+    edgeDetectionImage = QImage(width, height, QImage::Format_RGB32);
+    for(int j = 0; j < height; j++)
+    {
+      for(int i = 0; i < width; i++)
+      {
+            edgeDetectionImage.setPixel(i, j, qRgb(edgeMatrix[j*width+i], edgeMatrix[j*width+i], edgeMatrix[j*width+i]));
+      }
+    }
+
+
+
 
     // QString defaultFilter = "Netpbm (*.pgm *.ppm *.pbm)";
     // QString fileName = QFileDialog::getOpenFileName(this, tr("Open image file"), "", tr("Netpbm (*.pgm *.ppm *.pbm);;GIF (*.gif);;JPEG (*.jpeg *.jpg)"), &defaultFilter);
