@@ -2,13 +2,15 @@ HEADERS       = \
     gaussianblur.hpp \
     window.hpp \
     imagefilter.hpp \
-    edgedetection.hpp
+    edgedetection.hpp \
+    imageutil.hpp
 
 SOURCES       = main.cpp \
                 window.cpp \
     gaussianblur.cpp \
     imagefilter.cpp \
-    edgedetection.cpp
+    edgedetection.cpp \
+    imageutil.cpp
 QT += core gui opengl widgets
 #RESOURCES += resources.qrc
 #QMAKE_CXXFLAGS += -DSHOULD_LOAD_SHADERS -std=c++11

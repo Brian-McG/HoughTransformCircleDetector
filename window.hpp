@@ -22,10 +22,11 @@ class window : public QMainWindow {
   explicit window(QWidget *parent = 0);
 
  private slots:
-  void open();
+  void open(QString &);
   void save();
   void selectInputImage();
   void selectSmoothedImage();
+  void selectMagnitudeImage();
   void selectEdgeDetectionImage();
   void selectCircleDetectionImage();
 
@@ -41,11 +42,13 @@ class window : public QMainWindow {
   QAction *saveAction;
   QAction *inputImageAction;
   QAction *smoothedImageAction;
+  QAction *magnitudeImageAction;
   QAction *edgeDetectionImageAction;
   QAction *circleDetectionImageAction;
   GLWidget *glWidget;
   QImage inputImage;
   QImage smoothedImage;
+  QImage magnitudeImage;
   QImage edgeDetectionImage;
   QImage circleDetectionImage;
   QLabel *imageLabel;

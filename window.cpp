@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QLabel>
 #include <QScrollArea>
+#include <QSignalMapper>
 #include <string>
 #include "./window.hpp"
 #include "./gaussianblur.hpp"
@@ -44,23 +45,26 @@ void window::setUpWidget() {
     imageScrollArea->setWidget(imageLabel);
 
     setCentralWidget(imageScrollArea);
-    open();
+    QString fileName = "images/testseq100000.pgm";
+    open(fileName);
     imageScrollArea->setVisible(true);
 }
 
 void window::addActions() {
     openAction = new QAction(tr("O&pen image"), this);
-    openAction->setStatusTip(tr("Opens an image"));
+    openAction->setToolTip(tr("Opens an image"));
     saveAction = new QAction(tr("S&ave image"), this);
-    saveAction->setStatusTip(tr("Saves an image"));
+    saveAction->setToolTip(tr("Saves an image"));
     inputImageAction = new QAction(tr("I&nput Image"), this);
-    inputImageAction->setStatusTip(tr("Sets image to input image"));
+    inputImageAction->setToolTip(tr("Sets image to input image"));
     smoothedImageAction = new QAction(tr("S&moothed Image"), this);
-    smoothedImageAction->setStatusTip(tr("Sets image to the smoothed image"));
+    smoothedImageAction->setToolTip(tr("Sets image to the smoothed image"));
+    magnitudeImageAction = new QAction(tr("M&agnitude Image"), this);
+    magnitudeImageAction->setToolTip(tr("Sets image to the magnitude image"));
     edgeDetectionImageAction = new QAction(tr("E&dge Detection Image"), this);
-    edgeDetectionImageAction->setStatusTip(tr("Sets image to the edge detection image"));
+    edgeDetectionImageAction->setToolTip(tr("Sets image to the edge detection image"));
     circleDetectionImageAction = new QAction(tr("C&ircle Detection Image"), this);
-    circleDetectionImageAction->setStatusTip(tr("Sets image to the circle detection image"));
+    circleDetectionImageAction->setToolTip(tr("Sets image to the circle detection image"));
 }
 
 void window::addMenus() {
@@ -70,78 +74,88 @@ void window::addMenus() {
     imageMenu = menuBar()->addMenu(tr("&Pick Image"));
     imageMenu->addAction(inputImageAction);
     imageMenu->addAction(smoothedImageAction);
+    imageMenu->addAction(magnitudeImageAction);
     imageMenu->addAction(edgeDetectionImageAction);
     imageMenu->addAction(circleDetectionImageAction);
 }
 
 void window::addConections() {
-    connect(openAction, SIGNAL(triggered()), this, SLOT(open()));
+    connect(openAction, &QAction::triggered, this, [this]{QString fileName = ""; open(fileName); });
     connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
     connect(inputImageAction, SIGNAL(triggered()), this, SLOT(selectInputImage()));
     connect(smoothedImageAction, SIGNAL(triggered()), this, SLOT(selectSmoothedImage()));
+    connect(magnitudeImageAction, SIGNAL(triggered()), this, SLOT(selectMagnitudeImage()));
     connect(edgeDetectionImageAction, SIGNAL(triggered()), this, SLOT(selectEdgeDetectionImage()));
     connect(circleDetectionImageAction, SIGNAL(triggered()), this, SLOT(selectCircleDetectionImage()));
 }
 
-void window::open() {
-    // Override filename to make testing quicker
-    QString fileName = "images/testseq100000.pgm";
-    QPixmap originalPixmap(fileName);
+void window::open(QString & fileName) {
+    if(fileName == "") {
+        fileName = QFileDialog::getOpenFileName(this, tr("Open image file"), "", tr("Supported Images (*.pgm *.ppm *.pbm *.jpeg *.jpg *.gif)"));
+    } if(fileName != "") {
+        QPixmap originalPixmap(fileName);
 
-    inputImage = originalPixmap.toImage();
-    int width = inputImage.width();
-    int height = inputImage.height();
-    int *matrix = new int [width*height];
+        inputImage = originalPixmap.toImage();
+        int width = inputImage.width();
+        int height = inputImage.height();
+        int *matrix = new int [width*height];
 
-    for(int j = 0; j < height; j++)
-    {
-      for(int i = 0; i < width; i++)
-      {
-        matrix[j*width+i] = qGray(inputImage.pixel(i,j));
-      }
-    }
+        for(int j = 0; j < height; j++)
+        {
+          for(int i = 0; i < width; i++)
+          {
+            matrix[j*width+i] = qGray(inputImage.pixel(i,j));
+          }
+        }
 
-    QImage modifiedImage(width, height, QImage::Format_RGB32);
-    for(int j = 0; j < height; j++)
-    {
-      for(int i = 0; i < width; i++)
-      {
-        modifiedImage.setPixel(i, j, qRgb(matrix[j*width+i], matrix[j*width+i], matrix[j*width+i]));
-      }
-    }
+        QImage modifiedImage(width, height, QImage::Format_RGB32);
+        for(int j = 0; j < height; j++)
+        {
+          for(int i = 0; i < width; i++)
+          {
+            modifiedImage.setPixel(i, j, qRgb(matrix[j*width+i], matrix[j*width+i], matrix[j*width+i]));
+          }
+        }
 
-    QPixmap modifiedPixmap = QPixmap::fromImage(modifiedImage);
+        QPixmap modifiedPixmap = QPixmap::fromImage(modifiedImage);
 
-    imageLabel->setPixmap(modifiedPixmap);
-    imageLabel->resize(imageLabel->pixmap()->size());
+        imageLabel->setPixmap(modifiedPixmap);
+        imageLabel->resize(imageLabel->pixmap()->size());
 
-    int* blurredMatrix = mcgbri004::applyGausianBlur(matrix, width, height, 1.4, 5);
-    smoothedImage = QImage(width, height, QImage::Format_RGB32);
-    for(int j = 0; j < height; j++)
-    {
-      for(int i = 0; i < width; i++)
-      {
-            smoothedImage.setPixel(i, j, qRgb(blurredMatrix[j*width+i], blurredMatrix[j*width+i], blurredMatrix[j*width+i]));
-      }
-    }
+        int* blurredMatrix = mcgbri004::applyGausianBlur(matrix, width, height, 1.4, 5);
+        smoothedImage = QImage(width, height, QImage::Format_RGB32);
+        for(int j = 0; j < height; j++)
+        {
+          for(int i = 0; i < width; i++)
+          {
+                smoothedImage.setPixel(i, j, qRgb(blurredMatrix[j*width+i], blurredMatrix[j*width+i], blurredMatrix[j*width+i]));
+          }
+        }
+        delete matrix;
 
-    int* edgeMatrix =  mcgbri004::applyEdgeDetection(blurredMatrix, width, height);
-    edgeDetectionImage = QImage(width, height, QImage::Format_RGB32);
-    for(int j = 0; j < height; j++)
-    {
-      for(int i = 0; i < width; i++)
-      {
-            edgeDetectionImage.setPixel(i, j, qRgb(edgeMatrix[j*width+i], edgeMatrix[j*width+i], edgeMatrix[j*width+i]));
-      }
-    }
+        int* magnitudeMatrix = mcgbri004::getMagnitudeImage(blurredMatrix, width, height);
+        magnitudeImage = QImage(width, height, QImage::Format_RGB32);
+        for(int j = 0; j < height; j++)
+        {
+          for(int i = 0; i < width; i++)
+          {
+                magnitudeImage.setPixel(i, j, qRgb(magnitudeMatrix[j*width+i], magnitudeMatrix[j*width+i], magnitudeMatrix[j*width+i]));
+          }
+        }
 
+        int* edgeMatrix =  mcgbri004::applyEdgeDetection(blurredMatrix, width, height);
+        edgeDetectionImage = QImage(width, height, QImage::Format_RGB32);
+        for(int j = 0; j < height; j++)
+        {
+          for(int i = 0; i < width; i++)
+          {
+                edgeDetectionImage.setPixel(i, j, qRgb(edgeMatrix[j*width+i], edgeMatrix[j*width+i], edgeMatrix[j*width+i]));
+          }
+        }
 
-
-
-    // QString defaultFilter = "Netpbm (*.pgm *.ppm *.pbm)";
-    // QString fileName = QFileDialog::getOpenFileName(this, tr("Open image file"), "", tr("Netpbm (*.pgm *.ppm *.pbm);;GIF (*.gif);;JPEG (*.jpeg *.jpg)"), &defaultFilter);
-    if (fileName != "") {
-
+        delete blurredMatrix;
+        delete magnitudeMatrix;
+        delete edgeMatrix;
     }
 }
 
@@ -178,6 +192,13 @@ void window::selectSmoothedImage() {
     imageLabel->setPixmap(modifiedPixmap);
     imageLabel->resize(imageLabel->pixmap()->size());
     currentImageSelection = 1;
+}
+
+void window::selectMagnitudeImage() {
+    QPixmap modifiedPixmap = QPixmap::fromImage(magnitudeImage);
+    imageLabel->setPixmap(modifiedPixmap);
+    imageLabel->resize(imageLabel->pixmap()->size());
+    currentImageSelection = 4;
 }
 
 void window::selectEdgeDetectionImage() {

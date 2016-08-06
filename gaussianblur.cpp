@@ -22,7 +22,6 @@ float* getGausianMatrix(float sigma, int w) {
     float* gausianMatrix = new float[w*w];
     float total = 0;
     int midpoint = w / 2;
-    std::cout << "midpoint: " << midpoint << std::endl;
 
     for (int y = 0; y < w; ++y) {
         for(int x = 0; x < w; ++x ) {
@@ -44,7 +43,6 @@ float* getGausianMatrix(float sigma, int w) {
 
 float getGausianValue(float sigma, int x, int y) {
     float gausianValue = (1/(2 * M_PI * pow(sigma, 2))) * exp(-1 *(pow(x, 2) + pow(y, 2)) / (2 * pow(sigma, 2)));
-    std::cout << (1/(2 * M_PI * pow(sigma, 2)))  << " " << gausianValue << " " << y << " " << x << std::endl;
     return gausianValue;
 }
 }

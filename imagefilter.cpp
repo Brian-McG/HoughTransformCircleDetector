@@ -2,6 +2,7 @@
 // MCGBRI004
 
 #include <cmath>
+#include "imageutil.hpp"
 
 namespace mcgbri004 {
 int* applyImageFilter(int* image, int imageXLen, int imageYLen, float* filter, int w) {
@@ -22,18 +23,8 @@ int* applyImageFilter(int* image, int imageXLen, int imageYLen, float* filter, i
                     int indexY = y + filterYValue;
 
                     // Reflect the boundaries
-                    if(indexX < 0) {
-                        indexX = abs(indexX + 1);
-                    } else if (indexX >= imageXLen) {
-                        int diff = indexX - imageXLen;
-                        indexX = indexX - (1 + diff);
-                    }
-                    if(indexY < 0) {
-                        indexY = abs(indexY + 1);
-                    } else if (indexY >= imageYLen) {
-                        int diff = indexY - imageYLen;
-                        indexY = indexY - (1 + diff);
-                    }
+                    indexX = mcgbri004::getBoundryReflectedIndex(imageXLen, indexX);
+                    indexY = mcgbri004::getBoundryReflectedIndex(imageYLen, indexY);
 
                     pixelValue += image[(indexY*imageXLen) + indexX] * filter[(matrixY*w) + matrixX];
                 }
