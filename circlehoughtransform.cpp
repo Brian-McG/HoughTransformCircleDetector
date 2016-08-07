@@ -12,7 +12,7 @@ int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen
     float* directions = edgeDetector->getDirectionsRef();
     int* circleDetectionImage = new int[imageXLen * imageYLen];
     int rStart = 10;
-    int rEnd = 40;
+    int rEnd = 60;
     int* accumulator = new int[imageXLen * imageYLen * (rEnd - rStart)];
     int count = 0;
     for (int r = rStart; r < rEnd; ++r) {
@@ -61,7 +61,7 @@ int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen
         }
     }
     int* finalAccumulator = new int[imageXLen * imageYLen];
-    int pixelWindow = 5;
+    int pixelWindow = 16;
     for (int y = pixelWindow; y < imageYLen; y+=pixelWindow) {
         for(int x = pixelWindow; x < imageXLen; x+=pixelWindow) {
             int maxX = -1;
