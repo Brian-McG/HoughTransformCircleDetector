@@ -7,8 +7,8 @@
 #include <math.h>
 
 namespace mcgbri004 {
-    float* getGausianMatrix(float sigma, int w);
-    float getGausianValue(float sigma, int x, int y);
-    int* applyGausianBlur(int* image, int imageXLen, int imageYLen, float sigma, int w);
+float* getGausianMatrix(float sigma, int w);
+float getGausianValue(float sigma, int x, int y);
+int* applyGausianBlur(int* image, int imageXLen, int imageYLen, float sigma, int w);
 }
 #endif // GAUSSIANBLUR_H

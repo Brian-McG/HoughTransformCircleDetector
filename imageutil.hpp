@@ -4,5 +4,6 @@ namespace mcgbri004 {
 int getBoundryReflectedIndex(int imageAxisLength, int index);
 float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLength, int x, int y);
 int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength, int x, int y);
+int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int x, int y, int z);
 }
 #endif // IMAGEUTIL_HPP

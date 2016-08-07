@@ -16,45 +16,45 @@ class QLabel;
 class QScrollArea;
 
 class window : public QMainWindow {
-  Q_OBJECT
- public:
-  virtual ~window();
-  explicit window(QWidget *parent = 0);
+    Q_OBJECT
+public:
+    virtual ~window();
+    explicit window(QWidget *parent = 0);
 
- private slots:
-  void open(QString &);
-  void save();
-  void selectInputImage();
-  void selectSmoothedImage();
-  void selectMagnitudeImage();
-  void selectEdgeDetectionImage();
-  void selectCircleDetectionImage();
+private slots:
+    void open(QString &);
+    void save();
+    void selectInputImage();
+    void selectSmoothedImage();
+    void selectMagnitudeImage();
+    void selectEdgeDetectionImage();
+    void selectCircleDetectionImage();
 
- private:
-  void addActions();
-  void addMenus();
-  void addConections();
-  void setUpWidget();
-  int currentImageSelection;
-  QMenu *fileMenu;
-  QMenu *imageMenu;
-  QAction *openAction;
-  QAction *saveAction;
-  QAction *inputImageAction;
-  QAction *smoothedImageAction;
-  QAction *magnitudeImageAction;
-  QAction *edgeDetectionImageAction;
-  QAction *circleDetectionImageAction;
-  GLWidget *glWidget;
-  QImage inputImage;
-  QImage smoothedImage;
-  QImage magnitudeImage;
-  QImage edgeDetectionImage;
-  QImage circleDetectionImage;
-  QLabel *imageLabel;
-  QScrollArea *imageScrollArea;
-  double scaleFactor;
-  std::vector<window *> windows;
+private:
+    void addActions();
+    void addMenus();
+    void addConections();
+    void setUpWidget();
+    int currentImageSelection;
+    QMenu *fileMenu;
+    QMenu *imageMenu;
+    QAction *openAction;
+    QAction *saveAction;
+    QAction *inputImageAction;
+    QAction *smoothedImageAction;
+    QAction *magnitudeImageAction;
+    QAction *edgeDetectionImageAction;
+    QAction *circleDetectionImageAction;
+    GLWidget *glWidget;
+    QImage inputImage;
+    QImage smoothedImage;
+    QImage magnitudeImage;
+    QImage edgeDetectionImage;
+    QImage circleDetectionImage;
+    QLabel *imageLabel;
+    QScrollArea *imageScrollArea;
+    double scaleFactor;
+    std::vector<window *> windows;
 };
 
 #endif  // WINDOW_H_

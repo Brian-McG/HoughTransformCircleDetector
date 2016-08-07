@@ -9,9 +9,10 @@
 #include <QScrollArea>
 #include <QSignalMapper>
 #include <string>
-#include "./window.hpp"
-#include "./gaussianblur.hpp"
-#include "./edgedetection.hpp"
+#include "window.hpp"
+#include "gaussianblur.hpp"
+#include "edgedetection.hpp"
+#include "circlehoughtransform.hpp"
 
 window::window(QWidget *parent) : QMainWindow(parent), imageLabel(new QLabel), imageScrollArea(new QScrollArea), currentImageSelection(0) {
     setUpWidget();
@@ -102,19 +103,19 @@ void window::open(QString & fileName) {
 
         for(int j = 0; j < height; j++)
         {
-          for(int i = 0; i < width; i++)
-          {
-            matrix[j*width+i] = qGray(inputImage.pixel(i,j));
-          }
+            for(int i = 0; i < width; i++)
+            {
+                matrix[j*width+i] = qGray(inputImage.pixel(i,j));
+            }
         }
 
         QImage modifiedImage(width, height, QImage::Format_RGB32);
         for(int j = 0; j < height; j++)
         {
-          for(int i = 0; i < width; i++)
-          {
-            modifiedImage.setPixel(i, j, qRgb(matrix[j*width+i], matrix[j*width+i], matrix[j*width+i]));
-          }
+            for(int i = 0; i < width; i++)
+            {
+                modifiedImage.setPixel(i, j, qRgb(matrix[j*width+i], matrix[j*width+i], matrix[j*width+i]));
+            }
         }
 
         QPixmap modifiedPixmap = QPixmap::fromImage(modifiedImage);
@@ -126,36 +127,49 @@ void window::open(QString & fileName) {
         smoothedImage = QImage(width, height, QImage::Format_RGB32);
         for(int j = 0; j < height; j++)
         {
-          for(int i = 0; i < width; i++)
-          {
+            for(int i = 0; i < width; i++)
+            {
                 smoothedImage.setPixel(i, j, qRgb(blurredMatrix[j*width+i], blurredMatrix[j*width+i], blurredMatrix[j*width+i]));
-          }
+            }
         }
         delete matrix;
 
-        int* magnitudeMatrix = mcgbri004::getMagnitudeImage(blurredMatrix, width, height);
+        mcgbri004::EdgeDetection * edgeDetector = new mcgbri004::EdgeDetection(blurredMatrix, width, height);
+        int* magnitudeMatrix = edgeDetector->getMagnitudeImageRef();
         magnitudeImage = QImage(width, height, QImage::Format_RGB32);
         for(int j = 0; j < height; j++)
         {
-          for(int i = 0; i < width; i++)
-          {
+            for(int i = 0; i < width; i++)
+            {
                 magnitudeImage.setPixel(i, j, qRgb(magnitudeMatrix[j*width+i], magnitudeMatrix[j*width+i], magnitudeMatrix[j*width+i]));
-          }
+            }
         }
 
-        int* edgeMatrix =  mcgbri004::applyEdgeDetection(blurredMatrix, width, height);
+        int* edgeMatrix =  edgeDetector->getEdgeDetectionImageRef();
         edgeDetectionImage = QImage(width, height, QImage::Format_RGB32);
         for(int j = 0; j < height; j++)
         {
-          for(int i = 0; i < width; i++)
-          {
+            for(int i = 0; i < width; i++)
+            {
                 edgeDetectionImage.setPixel(i, j, qRgb(edgeMatrix[j*width+i], edgeMatrix[j*width+i], edgeMatrix[j*width+i]));
-          }
+            }
         }
 
+        int* circleDetectedMatrix = mcgbri004::getCirclesInImage(edgeDetector, width, height);
+        circleDetectionImage = QImage(width, height, QImage::Format_RGB32);
+        for(int j = 0; j < height; j++)
+        {
+            for(int i = 0; i < width; i++)
+            {
+                if(circleDetectedMatrix[j*width+i] != 0) {
+                    circleDetectionImage.setPixel(i, j, qRgb(0, 255, 0));
+                } else {
+                    circleDetectionImage.setPixel(i, j, qRgb(edgeMatrix[j*width+i], edgeMatrix[j*width+i], edgeMatrix[j*width+i]));
+                }
+            }
+        }
+        delete edgeDetector;
         delete blurredMatrix;
-        delete magnitudeMatrix;
-        delete edgeMatrix;
     }
 }
 
