@@ -61,7 +61,6 @@ void EdgeDetection::determineMagnitudeImage() {
 }
 
 void EdgeDetection::determineEdgeDetection() {
-    std::cout << "Debug 19" << std::endl;
     // Use Intel's IPP definition of a 5x5 sobel filter (https://software.intel.com/en-us/node/504204):
     int w = 5;
     float xDeltaMatrix[] = {-1, -2, 0, -2, -1, -4, -8, 0, 8, 4, -6, -12, 0, 12, 6, -4, -8, 0, 8, 4, -1, -2, 0, 2, 1};

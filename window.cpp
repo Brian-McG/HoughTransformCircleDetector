@@ -46,7 +46,7 @@ void window::setUpWidget() {
     imageScrollArea->setWidget(imageLabel);
 
     setCentralWidget(imageScrollArea);
-    QString fileName = "images/testseq100000.pgm";
+    QString fileName = "./images/testseq100000.pgm";
     open(fileName);
     imageScrollArea->setVisible(true);
 }

@@ -2,6 +2,7 @@
 // MCGBRI004
 #include <iostream>
 #include <cmath>
+#include <vector>
 #include "edgedetection.hpp"
 #include "circlehoughtransform.hpp"
 #include "linedrawingutil.hpp"
@@ -89,14 +90,17 @@ int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen
                 }
             }
             if(maxX != -1) {
-                finalAccumulator[maxY*imageXLen + maxX] = cleanedAccumulator[maxX + maxY*imageXLen + maxR*imageXLen*imageYLen];
-                addCircleToImage(finalAccumulator, imageXLen, imageYLen, maxX, maxY, (maxR+rStart));
-                //return finalAccumulator;
-                //finalAccumulator[(maxY - (maxR + rStart))*imageXLen + maxX] = -1;
+                // finalAccumulator[maxY*imageXLen + maxX] = cleanedAccumulator[maxX + maxY*imageXLen + maxR*imageXLen*imageYLen];
+                std::vector<std::pair<int, int>> circleCoordinates = produceCircleCoordinatesForImage(imageXLen, imageYLen, maxX, maxY, (maxR+rStart));
+                //addCircleToImage(finalAccumulator, imageXLen, circleCoordinates);
             }
         }
 
     }
     return finalAccumulator;
+}
+
+bool evaluateCandidateCircle(EdgeDetection* edgeDetector, std::vector<std::pair<int, int>>& circleCoordinates) {
+
 }
 }
