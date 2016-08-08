@@ -132,7 +132,7 @@ void window::open(QString & fileName) {
                 smoothedImage.setPixel(i, j, qRgb(blurredMatrix[j*width+i], blurredMatrix[j*width+i], blurredMatrix[j*width+i]));
             }
         }
-        delete matrix;
+        //delete matrix;
 
         mcgbri004::EdgeDetection * edgeDetector = new mcgbri004::EdgeDetection(blurredMatrix, width, height);
         int* magnitudeMatrix = edgeDetector->getMagnitudeImageRef();
@@ -162,9 +162,9 @@ void window::open(QString & fileName) {
             for(int i = 0; i < width; i++)
             {
                 if(circleDetectedMatrix[j*width+i] != 0) {
-                    circleDetectionImage.setPixel(i, j, qRgb(0, 255, 0));
+                    circleDetectionImage.setPixel(i, j, qRgb(255, 0, 0));
                 } else {
-                    circleDetectionImage.setPixel(i, j, qRgb(edgeMatrix[j*width+i], edgeMatrix[j*width+i], edgeMatrix[j*width+i]));
+                    circleDetectionImage.setPixel(i, j, qRgb(matrix[j*width+i], matrix[j*width+i], matrix[j*width+i]));
                 }
             }
         }

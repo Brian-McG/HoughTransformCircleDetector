@@ -4,6 +4,7 @@
 #include <cmath>
 #include "edgedetection.hpp"
 #include "circlehoughtransform.hpp"
+#include "linedrawingutil.hpp"
 #include "imageutil.hpp"
 
 namespace mcgbri004 {
@@ -33,14 +34,15 @@ int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen
         }
     }
     int* cleanedAccumulator = new int[imageXLen * imageYLen * (rEnd - rStart)];
+    int pixelWindow = 3;
     for (int r = rStart; r < rEnd; ++r) {
         for (int y = 0; y < imageYLen; ++y) {
             for(int x =0; x < imageXLen; ++x) {
                 bool localMaximum = true;
                 int accumulatorValue = accumulator[x + y*imageXLen + (r-rStart)*imageXLen*imageYLen];
                 if(accumulatorValue > 20) {
-                    for(int yDelta = -3; yDelta <= 3; ++yDelta) {
-                        for (int xDelta = -3; xDelta <= 3; ++xDelta) {
+                    for(int yDelta = pixelWindow; yDelta <= pixelWindow; ++yDelta) {
+                        for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
                             if((yDelta != 0 || xDelta != 0)) {
                                 int localValue = getBoundryZeroedValue(accumulator, imageXLen, imageYLen, rEnd-rStart, x+xDelta, y+yDelta, r-rStart);
                                 if(localValue > accumulatorValue) {
@@ -61,7 +63,13 @@ int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen
         }
     }
     int* finalAccumulator = new int[imageXLen * imageYLen];
-    int pixelWindow = 16;
+
+    for (int y = 0; y < imageYLen; ++y) {
+        for(int x =0; x < imageXLen; ++x) {
+            finalAccumulator[y*imageXLen + x] = 0;
+        }
+    }
+    pixelWindow = 20;
     for (int y = pixelWindow; y < imageYLen; y+=pixelWindow) {
         for(int x = pixelWindow; x < imageXLen; x+=pixelWindow) {
             int maxX = -1;
@@ -70,9 +78,6 @@ int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen
             int maxValue = 0;
             for(int yDelta = -pixelWindow; yDelta <= pixelWindow; ++yDelta) {
                 for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
-                    if(x+xDelta < imageXLen && y+yDelta < imageYLen) {
-                        finalAccumulator[(y+yDelta)*imageXLen + (x+xDelta)] = 0;
-                    }
                     for (int r = rStart; r < rEnd; ++r) {
                         int localValue = getBoundryZeroedValue(cleanedAccumulator, imageXLen, imageYLen, rEnd-rStart, x+xDelta, y+yDelta, r-rStart);
                         if(localValue > maxValue) {
@@ -85,6 +90,9 @@ int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen
             }
             if(maxX != -1) {
                 finalAccumulator[maxY*imageXLen + maxX] = cleanedAccumulator[maxX + maxY*imageXLen + maxR*imageXLen*imageYLen];
+                addCircleToImage(finalAccumulator, imageXLen, imageYLen, maxX, maxY, (maxR+rStart));
+                //return finalAccumulator;
+                //finalAccumulator[(maxY - (maxR + rStart))*imageXLen + maxX] = -1;
             }
         }
 
