@@ -11,7 +11,8 @@ std::vector<std::pair<int, int>> produceCircleCoordinatesForImage(int imageXLen,
     int pk, x, y;
     pk = 3 - 2*r;
     x=0; y = r;
-    std::vector<std::pair<int, int>> circleCoordinates(r*r);
+    std::vector<std::pair<int, int>> circleCoordinates;
+    circleCoordinates.reserve(r*r);
     drawCircle(circleCoordinates, imageXLen, imageYLen, x,y,midPointX,midPointY);
     while(x < y) {
         if(pk <= 0) {
