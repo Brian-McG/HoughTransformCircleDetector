@@ -42,13 +42,17 @@ int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen
         }
     }
     float* cleanedAccumulator = new float[(imageXLen + (2 * xOverlap)) * (imageYLen + (2 * yOverlap)) * (rEnd - rStart)];
-    int pixelWindow = 3;
+    int pixelWindow = 5;
     for (int r = rStart; r < rEnd; ++r) {
         for (int y = 0; y < (imageYLen + (2 * yOverlap)); ++y) {
             for(int x =0; x < (imageXLen + (2 * xOverlap)); ++x) {
                 bool viable = false;
                 int accumulatorValue = accumulator[x + y*(imageXLen + (2 * xOverlap)) + (r-rStart)*(imageXLen + (2 * xOverlap))*(imageYLen + (2 * yOverlap))];
-                if(accumulatorValue > 10) {
+                int accumulatorCriterion = 15;
+                if(x - xOverlap < 0 || y - yOverlap < 0 || x - xOverlap > imageXLen || y - yOverlap > imageYLen) {
+                    accumulatorCriterion = 10;
+                }
+                if(accumulatorValue > accumulatorCriterion) {
                     for(int yDelta = -pixelWindow; yDelta <= pixelWindow; ++yDelta) {
                         for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
                             std::vector<std::pair<int, int>> circleCoordinates = produceCircleCoordinatesForImage(imageXLen, imageYLen, (x+xDelta) - xOverlap, (y+yDelta) - yOverlap, r);
@@ -79,7 +83,11 @@ int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen
                 for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
                     for (int r = rStart; r < rEnd; ++r) {
                         float localValue = getBoundryZeroedValue(cleanedAccumulator, (imageXLen + (2 * xOverlap)), (imageYLen + (2 * yOverlap)), rEnd-rStart, x+xDelta, y+yDelta, r-rStart);
-                        if(localValue > maxValue && localValue > 30) {
+                        int valueCriterion = 20;
+                        if((x+xDelta) - xOverlap < 0 || (y+yDelta) - yOverlap < 0 || (x+xDelta) - xOverlap > imageXLen || (y+yDelta) - yOverlap > imageYLen) {
+                            valueCriterion = 5;
+                        }
+                        if(localValue > maxValue && localValue > valueCriterion) {
                             maxValue = localValue;
                             maxX = x+xDelta;
                             maxY = y+yDelta;
