@@ -178,7 +178,6 @@ void EdgeDetection::determineEdgeDetection() {
                 edgeDetectionImage[y*imageXLen + x] = 0;
                 for(int i = 0; i < 8; ++i) {
                     if(boundaryValues[i] == 255) {
-                        std::cout << "Works" << std::endl;
                         edgeDetectionImage[y*imageXLen + x] = 255;
                         break;
                     }

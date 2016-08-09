@@ -46,7 +46,7 @@ void window::setUpWidget() {
     imageScrollArea->setWidget(imageLabel);
 
     setCentralWidget(imageScrollArea);
-    QString fileName = "./images/testseq100000.pgm";
+    QString fileName = "./images/testseq100136.pgm";
     open(fileName);
     imageScrollArea->setVisible(true);
 }
@@ -163,8 +163,10 @@ void window::open(QString & fileName) {
             {
                 if(circleDetectedMatrix[j*width+i] != 0) {
                     circleDetectionImage.setPixel(i, j, qRgb(255, 0, 0));
+                } else if (edgeMatrix[j*width+i] == 255) {
+                    circleDetectionImage.setPixel(i, j, qRgb(edgeMatrix[j*width+i], edgeMatrix[j*width+i], edgeMatrix[j*width+i]));
                 } else {
-                    circleDetectionImage.setPixel(i, j, qRgb(matrix[j*width+i], matrix[j*width+i], matrix[j*width+i]));
+                    circleDetectionImage.setPixel(i, j, qRgb(0, 0, 0));
                 }
             }
         }
