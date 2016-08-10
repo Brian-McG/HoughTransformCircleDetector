@@ -93,11 +93,11 @@ void incrementWithOverlap(int* image, int imageXAxisLength, int imageYAxisLength
     int xOverlap = imageXAxisLength / overlapProportion;
     int yOverlap = imageYAxisLength / overlapProportion;
     if(z < 0 || z >= imageZAxisLength) {
-        std::cout << "WARNING: <incrementWithOverlap> invalid z input" << std::endl;
+        //std::cout << "WARNING: <incrementWithOverlap> invalid z input" << std::endl;
         return;
     }
     if (y < -yOverlap || x < -xOverlap || x > imageXAxisLength + xOverlap || y > imageYAxisLength + yOverlap) {
-        std::cout << "WARNING: (incrementWithOverlap) outside overlap boundries" << std::endl;
+        //std::cout << "WARNING: (incrementWithOverlap) outside overlap boundries" << std::endl;
         return;
     }
     ++image[(y + yOverlap)*(imageXAxisLength + 2 * xOverlap) + (x + xOverlap) + z*(imageXAxisLength + 2 * xOverlap)*(imageYAxisLength + 2 * yOverlap)];
