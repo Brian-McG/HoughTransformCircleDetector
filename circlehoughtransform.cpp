@@ -3,14 +3,27 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <QImage>
 #include "edgedetection.hpp"
 #include "circlehoughtransform.hpp"
 #include "linedrawingutil.hpp"
 #include "imageutil.hpp"
 
 namespace mcgbri004 {
+CircleHoughTransform::CircleHoughTransform(EdgeDetection* edgeDetector, int imageXLen, int imageYLen) {
+    this->edgeDetector = edgeDetector;
+    this->imageXLen = imageXLen;
+    this->imageYLen = imageYLen;
+    this->circleDetectionImage = nullptr;
+    this->accumulatorImage = nullptr;
+}
 
-void fillAccumulationLayer(int * accumulator, EdgeDetection* edgeDetector, int imageXLen, int imageYLen, int rStart, int rEnd, int pixelWindow, int overlapProportion, int r, int rIndex) {
+CircleHoughTransform::~CircleHoughTransform() {
+    delete[] circleDetectionImage;
+    delete[] accumulatorImage;
+}
+
+void CircleHoughTransform::fillAccumulationLayer(int * accumulator, int rLength, int rIndex) {
     int* edgeDetectedImage = edgeDetector->getEdgeDetectionImageRef();
     float* directions = edgeDetector->getDirectionsRef();
     const int xOverlap = imageXLen / overlapProportion;
@@ -19,10 +32,10 @@ void fillAccumulationLayer(int * accumulator, EdgeDetection* edgeDetector, int i
     for (int y = 0; y < imageYLen; ++y) {
         for(int x =0; x < imageXLen; ++x) {
             if(edgeDetectedImage[y*imageXLen + x] == 255) {
-                int x2 = x + (r * cos(directions[y*imageXLen + x] * M_PI / 180.0));
-                int y2 = y + (r * sin(directions[y*imageXLen + x] * M_PI / 180.0));
-                int x3 = x + round(r * cos((directions[y*imageXLen + x] + 180) * M_PI / 180.0));
-                int y3 = y + round(r * sin((directions[y*imageXLen + x] + 180) * M_PI / 180.0));
+                int x2 = x + (rLength * cos(directions[y*imageXLen + x] * M_PI / 180.0));
+                int y2 = y + (rLength * sin(directions[y*imageXLen + x] * M_PI / 180.0));
+                int x3 = x + round(rLength * cos((directions[y*imageXLen + x] + 180) * M_PI / 180.0));
+                int y3 = y + round(rLength * sin((directions[y*imageXLen + x] + 180) * M_PI / 180.0));
                 incrementWithOverlap(accumulator, imageXLen, imageYLen, rEnd-rStart, overlapProportion, x2, y2, rIndex);
                 //                    incrementWithOverlap(accumulator, imageXLen, imageYLen, rEnd-rStart, overlapProportion, x3, y3, r-rStart);
             }
@@ -35,15 +48,17 @@ void fillAccumulationLayer(int * accumulator, EdgeDetection* edgeDetector, int i
             int accumulatorValue = accumulator[x + y*(imageXLen + (2 * xOverlap)) + (rIndex)*(imageXLen + (2 * xOverlap))*(imageYLen + (2 * yOverlap))];
             int accumulatorCriterion = 20;
             // Provide more leaniant accumulation criterion for shapes on boundries
-            if(x - xOverlap < 0 || y - yOverlap < 0 || x - xOverlap > imageXLen || y - yOverlap > imageYLen) {
+            if(rLength < 25 && (x - xOverlap < 0 || y - yOverlap < 0 || x - xOverlap > imageXLen || y - yOverlap > imageYLen)) {
+                accumulatorCriterion = 5;
+            } else {
                 accumulatorCriterion = 10;
             }
             if(accumulatorValue > accumulatorCriterion) {
                 for(int yDelta = -pixelWindow; yDelta <= pixelWindow; ++yDelta) {
                     for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
-                        //if(getBoundryNegatedValue(evaluationMatrix, imageXLen, imageYLen, x+xDelta, y+yDelta) == 0) {
+                        if(getBoundryNegatedValue(evaluationMatrix, (imageXLen + (2 * xOverlap)), (imageYLen + (2 * yOverlap)), x+xDelta, y+yDelta) == 0) {
                             // Produce a test circle to evaluate
-                            std::vector<std::pair<int, int>> circleCoordinates = produceCircleCoordinatesForImage(imageXLen, imageYLen, (x+xDelta) - xOverlap, (y+yDelta) - yOverlap, r);
+                            std::vector<std::pair<int, int>> circleCoordinates = produceCircleCoordinatesForImage(imageXLen, imageYLen, (x+xDelta) - xOverlap, (y+yDelta) - yOverlap, rLength);
 
                             // We evaluate neighbouring pixels too since we are using a discrete value of r, we assume there could be some inaccuracies
                             int evaluationScore = evaluateCandidateCircle(edgeDetector, imageXLen, imageYLen, circleCoordinates) * 100;
@@ -52,7 +67,7 @@ void fillAccumulationLayer(int * accumulator, EdgeDetection* edgeDetector, int i
                             } else {
                                 evaluationMatrix[(x+xDelta) + (y+yDelta)*(imageXLen + (2 * xOverlap))] = -1;
                             }
-                       // }
+                        }
                     }
                 }
             }
@@ -64,76 +79,82 @@ void fillAccumulationLayer(int * accumulator, EdgeDetection* edgeDetector, int i
             accumulator[x + y*(imageXLen + (2 * xOverlap)) + (rIndex)*(imageXLen + (2 * xOverlap))*(imageYLen + (2 * yOverlap))] = evaluationMatrix[x + y*(imageXLen + (2 * xOverlap))];
         }
     }
-    delete evaluationMatrix;
+    delete[] evaluationMatrix;
 }
 
-int* getCirclesInImage(EdgeDetection* edgeDetector, int imageXLen, int imageYLen) {
-    int* edgeDetectedImage = edgeDetector->getEdgeDetectionImageRef();
-    float* directions = edgeDetector->getDirectionsRef();
-    const int overlapProportion = 4;
-    const int xOverlap = imageXLen / overlapProportion;
-    const int yOverlap = imageYLen / overlapProportion;
-    const int rStart = 10;
-    const int rEnd = 60;
-    const int rWindow = 50;
-    const int pixelWindow = 3;
-    int valueCriterion = 50;
-    int * accumulator = new int[(imageXLen + (2 * xOverlap)) * (imageYLen + (2 * yOverlap)) * (rWindow*2)];
-    std::fill(accumulator, accumulator + (imageXLen + (2 * xOverlap)) * (imageYLen + (2 * yOverlap)) * (rWindow*2), 0);
+int* CircleHoughTransform::getCirclesInImage() {
+    if(circleDetectionImage == nullptr) {
+        const int xOverlap = imageXLen / overlapProportion;
+        const int yOverlap = imageYLen / overlapProportion;
 
-    // Fill r-value windowed accumulator
-    for (int r = rStart; r < rStart + (2 * rWindow); ++r) {
-        fillAccumulationLayer(accumulator, edgeDetector, imageXLen, imageYLen, rStart, rEnd, pixelWindow, overlapProportion, r, r-rStart);
-    }
+        this->circleDetectionImage = new int[imageXLen * imageYLen];
+        std::fill(circleDetectionImage, circleDetectionImage + imageXLen * imageYLen, 0);
 
-    int* circleDetectionImage = new int[imageXLen * imageYLen];
-    std::fill(circleDetectionImage, circleDetectionImage + imageXLen * imageYLen, 0);
-    for (int r = rStart; r < rEnd; ++r) {
-        const int windowRIndex = (r - rStart) % (rWindow*2);
-        for (int y = 0; y < (imageYLen + (2 * yOverlap)); ++y) {
-            for(int x =0; x < (imageXLen + (2 * xOverlap)); ++x) {
-                int maxX = -1;
-                int maxY = -1;
-                int maxR = -1;
-                int maxValue = 0;
-                if(accumulator[x + y * (imageXLen + (2 * xOverlap)) + (windowRIndex)*(imageXLen + (2 * xOverlap))*(imageYLen + (2 * yOverlap))] > 0) {
-                    for(int yDelta = -pixelWindow; yDelta <= pixelWindow; ++yDelta) {
-                        for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
-                            for (int rDelta = -rWindow; rDelta <= rWindow; ++rDelta) {
-                                if(r - rStart + rDelta > 0) {
-                                    const int windowRDeltaIndex = (r - rStart + rDelta) % (rWindow*2);
-                                    int localValue = getBoundryZeroedValue(accumulator, (imageXLen + (2 * xOverlap)), (imageYLen + (2 * yOverlap)), (rWindow*2), x+xDelta, y+yDelta, windowRDeltaIndex);
-                                    if((x+xDelta) - xOverlap < 0 || (y+yDelta) - yOverlap < 0 || (x+xDelta) - xOverlap > imageXLen || (y+yDelta) - yOverlap > imageYLen) {
-                                        valueCriterion = 10;
-                                    }
-                                    if(localValue > maxValue && localValue > valueCriterion) {
-                                        maxValue = localValue;
-                                        maxX = x+xDelta;
-                                        maxY = y+yDelta;
-                                        maxR = r + rDelta;
+        /* N.B. As per Assoc. Prof. Marais's suggestion, we construct this image array for visualization purposes only.
+         * Note that the algorithm presented does not use this to determine the circles in the image.
+         */
+        this->accumulatorImage = new QImage[this->totalRLength];
+
+        /* Declare the actual accumulator that the algorithm uses.
+         * Note the size of the accumulator actually required uses a fixed z length, essentially making it O(n^2) apposed to the
+         * matrix used for visualisation only, which would be O(n^3)
+         */
+        int * accumulator = new int[(imageXLen + (2 * xOverlap)) * (imageYLen + (2 * yOverlap)) * accumulatorRBufferLen];
+        std::fill(accumulator, accumulator + (imageXLen + (2 * xOverlap)) * (imageYLen + (2 * yOverlap)) * (rWindow*2), 0);
+
+        // Fill r-value windowed accumulator
+        for (int r = rStart; r < rStart + accumulatorRBufferLen; ++r) {
+            fillAccumulationLayer(accumulator, r, r-rStart);
+        }
+
+        for (int r = rStart; r < rEnd; ++r) {
+            const int windowRIndex = (r - rStart) % accumulatorRBufferLen;
+            for (int y = 0; y < (imageYLen + (2 * yOverlap)); ++y) {
+                for(int x =0; x < (imageXLen + (2 * xOverlap)); ++x) {
+                    int maxX = -1;
+                    int maxY = -1;
+                    int maxR = -1;
+                    int maxValue = 0;
+                    if(accumulator[x + y * (imageXLen + (2 * xOverlap)) + (windowRIndex)*(imageXLen + (2 * xOverlap))*(imageYLen + (2 * yOverlap))] > 0) {
+                        for(int yDelta = -pixelWindow; yDelta <= pixelWindow; ++yDelta) {
+                            for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
+                                for (int rDelta = -rWindow; rDelta <= rWindow; ++rDelta) {
+                                    if(r - rStart + rDelta >= 0 && r + rDelta < rEnd) {
+                                        const int windowRDeltaIndex = (r - rStart + rDelta) % accumulatorRBufferLen;
+                                        int localValue = getBoundryZeroedValue(accumulator, (imageXLen + (2 * xOverlap)), (imageYLen + (2 * yOverlap)), accumulatorRBufferLen, x+xDelta, y+yDelta, windowRDeltaIndex);
+                                        int valueCriterion = 49;
+                                        if((x+xDelta) - xOverlap < 0 || (y+yDelta) - yOverlap < 0 || (x+xDelta) - xOverlap > imageXLen || (y+yDelta) - yOverlap > imageYLen) {
+                                            valueCriterion = 60;
+                                        }
+                                        if(localValue > maxValue && localValue > valueCriterion) {
+                                            maxValue = localValue;
+                                            maxX = x+xDelta;
+                                            maxY = y+yDelta;
+                                            maxR = r + rDelta;
+                                        }
                                     }
                                 }
                             }
                         }
-                    }
-                    if(maxX == x && maxY == y && r == maxR) {
-                        std::vector<std::pair<int, int>> circleCoordinates = produceCircleCoordinatesForImage(imageXLen, imageYLen, maxX - xOverlap, maxY - yOverlap, maxR);
-                        addCircleToImage(circleDetectionImage, imageXLen, circleCoordinates);
+                        if(maxX == x && maxY == y && r == maxR) {
+                            std::vector<std::pair<int, int>> circleCoordinates = produceCircleCoordinatesForImage(imageXLen, imageYLen, maxX - xOverlap, maxY - yOverlap, maxR);
+                            addCircleToImage(circleDetectionImage, imageXLen, circleCoordinates);
+                        }
                     }
                 }
             }
-        }
 
-        if (r+1 < rEnd) {
-            for (int y = 0; y < (imageYLen + (2 * yOverlap)); ++y) {
-                for(int x =0; x < (imageXLen + (2 * xOverlap)); ++x) {
-                    accumulator[x + y*(imageXLen + (2 * xOverlap)) + ((r - rStart + 1) % (rWindow*2))*(imageXLen + (2 * xOverlap))*(imageYLen + (2 * yOverlap))] = 0;
+            if (r + 1 + rWindow < rEnd && r+1 > rWindow) {
+                for (int y = 0; y < (imageYLen + (2 * yOverlap)); ++y) {
+                    for(int x =0; x < (imageXLen + (2 * xOverlap)); ++x) {
+                        accumulator[x + y*(imageXLen + (2 * xOverlap)) + ((r - rStart + 1 + rWindow) % accumulatorRBufferLen)*(imageXLen + (2 * xOverlap))*(imageYLen + (2 * yOverlap))] = 0;
+                    }
                 }
+                fillAccumulationLayer(accumulator, r + 1 + rWindow, (r - rStart + 1 + rWindow) % accumulatorRBufferLen);
             }
-            fillAccumulationLayer(accumulator, edgeDetector, imageXLen, imageYLen, rStart, rEnd, pixelWindow, overlapProportion, r + 1, (r + 1 - rStart) % (rWindow*2));
         }
+        delete[] accumulator;
     }
-    delete accumulator;
     return circleDetectionImage;
 }
 
@@ -157,7 +178,6 @@ float evaluateCandidateCircle(EdgeDetection* edgeDetector, int imageXLen, int im
         }
     }
     float evaluationScore = float(correctEvaluations) / float(totalEvaluations);
-    //std::cout << correctEvaluations << " " << totalEvaluations << " " << evaluationScore << std::endl;
     return evaluationScore;
 }
 }
