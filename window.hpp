@@ -14,6 +14,8 @@ class QAction;
 class QMenu;
 class QLabel;
 class QScrollArea;
+class QSlider;
+class QVBoxLayout;
 
 class window : public QMainWindow {
     Q_OBJECT
@@ -26,8 +28,9 @@ private slots:
     void save();
     void selectInputImage();
     void selectSmoothedImage();
-    void selectMagnitudeImage();
+    void selectMagnitudeImage();    
     void selectEdgeDetectionImage();
+    void selectAccumulatorImage();
     void selectCircleDetectionImage();
 
 private:
@@ -36,6 +39,8 @@ private:
     void addConections();
     void setUpWidget();
     int currentImageSelection;
+    int height;
+    int width;
     QMenu *fileMenu;
     QMenu *imageMenu;
     QAction *openAction;
@@ -44,15 +49,21 @@ private:
     QAction *smoothedImageAction;
     QAction *magnitudeImageAction;
     QAction *edgeDetectionImageAction;
+    QAction *accumulatorImageAction;
     QAction *circleDetectionImageAction;
-    GLWidget *glWidget;
+    QWidget *qLayoutWidget;
     QImage inputImage;
     QImage smoothedImage;
     QImage magnitudeImage;
     QImage edgeDetectionImage;
+    QImage *accumulatorImages;
     QImage circleDetectionImage;
+    QLabel *imageDescriptionLabel;
     QLabel *imageLabel;
+    QLabel * sliderLabel;
     QScrollArea *imageScrollArea;
+    QSlider *accumulatorSlider;
+    QVBoxLayout *layout;
     double scaleFactor;
     std::vector<window *> windows;
 };

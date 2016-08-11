@@ -8,17 +8,23 @@
 #include <QLabel>
 #include <QScrollArea>
 #include <QSignalMapper>
+#include <QVBoxLayout>
+#include <QSlider>
 #include <string>
 #include "window.hpp"
 #include "gaussianblur.hpp"
 #include "edgedetection.hpp"
 #include "circlehoughtransform.hpp"
+#include "imageutil.hpp"
 
 window::window(QWidget *parent) : QMainWindow(parent), imageLabel(new QLabel), imageScrollArea(new QScrollArea), currentImageSelection(0) {
     setUpWidget();
     addActions();
     addMenus();
     addConections();
+    QString fileName = "./images/testseq100136.pgm";
+    open(fileName);
+    imageScrollArea->setVisible(true);
 }
 
 window::~window() { 
@@ -27,28 +33,54 @@ window::~window() {
     delete inputImageAction;
     delete smoothedImageAction;
     delete edgeDetectionImageAction;
+    delete accumulatorImageAction;
     delete circleDetectionImageAction;
     delete imageLabel;
     delete imageScrollArea;
     delete imageMenu;
     delete fileMenu;
+    delete accumulatorSlider;
+    delete layout;
+    delete sliderLabel;
+    delete qLayoutWidget;
+    //delete[] accumulatorImages;
     for (unsigned int i =0; i < windows.size(); ++i) {
         delete windows[i];
     }
 }
 
 void window::setUpWidget() {
-
+    layout = new QVBoxLayout;
     imageLabel->setBackgroundRole(QPalette::Base);
     imageLabel->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
     imageLabel->setScaledContents(true);
     imageLabel->setBackgroundRole(QPalette::Dark);
     imageScrollArea->setWidget(imageLabel);
 
-    setCentralWidget(imageScrollArea);
-    QString fileName = "./images/testseq100136.pgm";
-    open(fileName);
-    imageScrollArea->setVisible(true);
+    accumulatorSlider = new QSlider(Qt::Horizontal);
+    accumulatorSlider->setTickPosition(QSlider::TicksBelow);
+    accumulatorSlider->setFocusPolicy(Qt::StrongFocus);
+    accumulatorSlider->setTickInterval(10);
+    accumulatorSlider->setSingleStep(1);
+    accumulatorSlider->setVisible(false);
+
+    sliderLabel = new QLabel;
+    sliderLabel->setText("Accumulator with radius set to 15");
+    sliderLabel->setVisible(false);
+    imageDescriptionLabel = new QLabel;
+    layout->addWidget(sliderLabel);
+    layout->addWidget(accumulatorSlider);
+    layout->addWidget(imageDescriptionLabel);
+    layout->addWidget(imageScrollArea);
+
+
+
+    // Set layout in QWidget
+    qLayoutWidget = new QWidget();
+    qLayoutWidget->setLayout(layout);
+
+    // Set QWidget as the central layout of the main window
+    setCentralWidget(qLayoutWidget);
 }
 
 void window::addActions() {
@@ -58,14 +90,22 @@ void window::addActions() {
     saveAction->setToolTip(tr("Saves an image"));
     inputImageAction = new QAction(tr("I&nput Image"), this);
     inputImageAction->setToolTip(tr("Sets image to input image"));
+    inputImageAction->setCheckable(true);
     smoothedImageAction = new QAction(tr("S&moothed Image"), this);
     smoothedImageAction->setToolTip(tr("Sets image to the smoothed image"));
+    smoothedImageAction->setCheckable(true);
     magnitudeImageAction = new QAction(tr("M&agnitude Image"), this);
     magnitudeImageAction->setToolTip(tr("Sets image to the magnitude image"));
+    magnitudeImageAction->setCheckable(true);
     edgeDetectionImageAction = new QAction(tr("E&dge Detection Image"), this);
     edgeDetectionImageAction->setToolTip(tr("Sets image to the edge detection image"));
+    edgeDetectionImageAction->setCheckable(true);
+    accumulatorImageAction = new QAction(tr("A&ccumulator View"), this);
+    accumulatorImageAction->setToolTip(tr("Sets image to the accumulator view"));
+    accumulatorImageAction->setCheckable(true);
     circleDetectionImageAction = new QAction(tr("C&ircle Detection Image"), this);
     circleDetectionImageAction->setToolTip(tr("Sets image to the circle detection image"));
+    circleDetectionImageAction->setCheckable(true);
 }
 
 void window::addMenus() {
@@ -77,6 +117,7 @@ void window::addMenus() {
     imageMenu->addAction(smoothedImageAction);
     imageMenu->addAction(magnitudeImageAction);
     imageMenu->addAction(edgeDetectionImageAction);
+    imageMenu->addAction(accumulatorImageAction);
     imageMenu->addAction(circleDetectionImageAction);
 }
 
@@ -87,6 +128,7 @@ void window::addConections() {
     connect(smoothedImageAction, SIGNAL(triggered()), this, SLOT(selectSmoothedImage()));
     connect(magnitudeImageAction, SIGNAL(triggered()), this, SLOT(selectMagnitudeImage()));
     connect(edgeDetectionImageAction, SIGNAL(triggered()), this, SLOT(selectEdgeDetectionImage()));
+    connect(accumulatorImageAction, SIGNAL(triggered()), this, SLOT(selectAccumulatorImage()));
     connect(circleDetectionImageAction, SIGNAL(triggered()), this, SLOT(selectCircleDetectionImage()));
 }
 
@@ -97,8 +139,8 @@ void window::open(QString & fileName) {
         QPixmap originalPixmap(fileName);
 
         inputImage = originalPixmap.toImage();
-        int width = inputImage.width();
-        int height = inputImage.height();
+        width = inputImage.width();
+        height = inputImage.height();
         int *matrix = new int [width*height];
 
         for(int j = 0; j < height; j++)
@@ -109,51 +151,18 @@ void window::open(QString & fileName) {
             }
         }
 
-        QImage modifiedImage(width, height, QImage::Format_RGB32);
-        for(int j = 0; j < height; j++)
-        {
-            for(int i = 0; i < width; i++)
-            {
-                modifiedImage.setPixel(i, j, qRgb(matrix[j*width+i], matrix[j*width+i], matrix[j*width+i]));
-            }
-        }
-
-        QPixmap modifiedPixmap = QPixmap::fromImage(modifiedImage);
-
-        imageLabel->setPixmap(modifiedPixmap);
-        imageLabel->resize(imageLabel->pixmap()->size());
-
         int* blurredMatrix = mcgbri004::applyGausianBlur(matrix, width, height, 1.4, 5);
         smoothedImage = QImage(width, height, QImage::Format_RGB32);
-        for(int j = 0; j < height; j++)
-        {
-            for(int i = 0; i < width; i++)
-            {
-                smoothedImage.setPixel(i, j, qRgb(blurredMatrix[j*width+i], blurredMatrix[j*width+i], blurredMatrix[j*width+i]));
-            }
-        }
-
+        mcgbri004::setQImage(smoothedImage, blurredMatrix, width, height);
 
         mcgbri004::EdgeDetection * edgeDetector = new mcgbri004::EdgeDetection(blurredMatrix, width, height);
         int* magnitudeMatrix = edgeDetector->getMagnitudeImageRef();
         magnitudeImage = QImage(width, height, QImage::Format_RGB32);
-        for(int j = 0; j < height; j++)
-        {
-            for(int i = 0; i < width; i++)
-            {
-                magnitudeImage.setPixel(i, j, qRgb(magnitudeMatrix[j*width+i], magnitudeMatrix[j*width+i], magnitudeMatrix[j*width+i]));
-            }
-        }
+        mcgbri004::setQImage(magnitudeImage, magnitudeMatrix, width, height);
 
         int* edgeMatrix =  edgeDetector->getEdgeDetectionImageRef();
         edgeDetectionImage = QImage(width, height, QImage::Format_RGB32);
-        for(int j = 0; j < height; j++)
-        {
-            for(int i = 0; i < width; i++)
-            {
-                edgeDetectionImage.setPixel(i, j, qRgb(edgeMatrix[j*width+i], edgeMatrix[j*width+i], edgeMatrix[j*width+i]));
-            }
-        }
+        mcgbri004::setQImage(edgeDetectionImage, edgeMatrix, width, height);
         delete[] blurredMatrix;
 
         mcgbri004::CircleHoughTransform * circleHoughTransform = new mcgbri004::CircleHoughTransform(edgeDetector, width, height);
@@ -170,6 +179,20 @@ void window::open(QString & fileName) {
                 }
             }
         }
+
+        accumulatorImages = new QImage[mcgbri004::CircleHoughTransform::rWindow];
+        QImage *accumulatorImagesRef = circleHoughTransform->getAccumulatorImages();
+        accumulatorImages[0] = accumulatorImagesRef[0];
+
+        QPixmap modifiedPixmap = QPixmap::fromImage(circleDetectionImage);
+
+        imageLabel->setPixmap(modifiedPixmap);
+        imageLabel->resize(imageLabel->pixmap()->size());
+        circleDetectionImageAction->setChecked(true);
+        imageDescriptionLabel->setText("Circle Hough Transform Detected Image");
+//        resize(width + 75, height + 100);
+        resize(width + 20, height + 60);
+
         delete[] matrix;
         delete edgeDetector;
         delete circleHoughTransform;
@@ -202,6 +225,16 @@ void window::selectInputImage() {
     imageLabel->setPixmap(modifiedPixmap);
     imageLabel->resize(imageLabel->pixmap()->size());
     currentImageSelection = 0;
+    inputImageAction->setChecked(true);
+    smoothedImageAction->setChecked(false);
+    edgeDetectionImageAction->setChecked(false);
+    accumulatorImageAction->setChecked(false);
+    circleDetectionImageAction->setChecked(false);
+    magnitudeImageAction->setChecked(false);
+    sliderLabel->setVisible(false);
+    accumulatorSlider->setVisible(false);
+    imageDescriptionLabel->setText("Input Image");
+    resize(width + 20, height + 60);
 }
 
 void window::selectSmoothedImage() {
@@ -209,6 +242,16 @@ void window::selectSmoothedImage() {
     imageLabel->setPixmap(modifiedPixmap);
     imageLabel->resize(imageLabel->pixmap()->size());
     currentImageSelection = 1;
+    inputImageAction->setChecked(false);
+    smoothedImageAction->setChecked(true);
+    edgeDetectionImageAction->setChecked(false);
+    accumulatorImageAction->setChecked(false);
+    circleDetectionImageAction->setChecked(false);
+    magnitudeImageAction->setChecked(false);
+    sliderLabel->setVisible(false);
+    accumulatorSlider->setVisible(false);
+    imageDescriptionLabel->setText("Gausian Blurred Image");
+    resize(width + 20, height + 60);
 }
 
 void window::selectMagnitudeImage() {
@@ -216,6 +259,16 @@ void window::selectMagnitudeImage() {
     imageLabel->setPixmap(modifiedPixmap);
     imageLabel->resize(imageLabel->pixmap()->size());
     currentImageSelection = 4;
+    inputImageAction->setChecked(false);
+    smoothedImageAction->setChecked(false);
+    edgeDetectionImageAction->setChecked(false);
+    circleDetectionImageAction->setChecked(false);
+    accumulatorImageAction->setChecked(false);
+    magnitudeImageAction->setChecked(true);
+    sliderLabel->setVisible(false);
+    accumulatorSlider->setVisible(false);
+    imageDescriptionLabel->setText("Intensity Gradient Image using a 5x5 Sobel Filter");
+    resize(width + 20, height + 60);
 }
 
 void window::selectEdgeDetectionImage() {
@@ -223,7 +276,33 @@ void window::selectEdgeDetectionImage() {
     imageLabel->setPixmap(modifiedPixmap);
     imageLabel->resize(imageLabel->pixmap()->size());
     currentImageSelection = 2;
+    inputImageAction->setChecked(false);
+    smoothedImageAction->setChecked(false);
+    edgeDetectionImageAction->setChecked(true);
+    accumulatorImageAction->setChecked(false);
+    circleDetectionImageAction->setChecked(false);
+    magnitudeImageAction->setChecked(false);
+    sliderLabel->setVisible(false);
+    accumulatorSlider->setVisible(false);
+    imageDescriptionLabel->setText("Canny Edge Detected Image");
+    resize(width + 20, height + 60);
+}
 
+void window::selectAccumulatorImage() {
+    QPixmap modifiedPixmap = QPixmap::fromImage(accumulatorImages[0]);
+    imageLabel->setPixmap(modifiedPixmap);
+    imageLabel->resize(imageLabel->pixmap()->size());
+    currentImageSelection = 3;
+    inputImageAction->setChecked(false);
+    smoothedImageAction->setChecked(false);
+    edgeDetectionImageAction->setChecked(false);
+    accumulatorImageAction->setChecked(true);
+    circleDetectionImageAction->setChecked(false);
+    magnitudeImageAction->setChecked(false);
+    sliderLabel->setVisible(true);
+    accumulatorSlider->setVisible(true);
+    imageDescriptionLabel->setText("Accumulator View");
+    resize(width + 20, height + 112);
 }
 
 void window::selectCircleDetectionImage() {
@@ -231,6 +310,15 @@ void window::selectCircleDetectionImage() {
     imageLabel->setPixmap(modifiedPixmap);
     imageLabel->resize(imageLabel->pixmap()->size());
     currentImageSelection = 3;
-
+    inputImageAction->setChecked(false);
+    smoothedImageAction->setChecked(false);
+    edgeDetectionImageAction->setChecked(false);
+    accumulatorImageAction->setChecked(false);
+    circleDetectionImageAction->setChecked(true);
+    magnitudeImageAction->setChecked(false);
+    sliderLabel->setVisible(false);
+    accumulatorSlider->setVisible(false);
+    imageDescriptionLabel->setText("Circle Hough Transform Detected Image");
+    resize(width + 20, height + 60);
 }
 

@@ -1,5 +1,6 @@
 #ifndef IMAGEUTIL_HPP
 #define IMAGEUTIL_HPP
+#include <QImage>
 namespace mcgbri004 {
 int getBoundryReflectedIndex(int imageAxisLength, int index);
 float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLength, int x, int y);
@@ -11,5 +12,6 @@ void incrementWithOverlap(float* image, int imageXAxisLength, int imageYAxisLeng
 void incrementWithOverlap(int* image, int imageXAxisLength, int imageYAxisLength, int overlapProportion, int x, int y);
 void incrementWithOverlap(float* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int overlapProportion, int x, int y, int z);
 void incrementWithOverlap(int* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int overlapProportion, int x, int y, int z);
+void setQImage(QImage & qImage, int* image, int imageXAxisLength, int imageYAxisLength);
 }
 #endif // IMAGEUTIL_HPP

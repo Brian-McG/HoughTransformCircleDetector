@@ -2,6 +2,7 @@
 // MCGBRI004
 #include <cmath>
 #include <iostream>
+#include <QImage>
 
 namespace mcgbri004 {
 int getBoundryReflectedIndex(int imageAxisLength, int index) {
@@ -101,5 +102,14 @@ void incrementWithOverlap(int* image, int imageXAxisLength, int imageYAxisLength
         return;
     }
     ++image[(y + yOverlap)*(imageXAxisLength + 2 * xOverlap) + (x + xOverlap) + z*(imageXAxisLength + 2 * xOverlap)*(imageYAxisLength + 2 * yOverlap)];
+}
+void setQImage(QImage & qImage, int* image, int imageXAxisLength, int imageYAxisLength) {
+    for(int y = 0; y < imageYAxisLength; ++y) {
+        for(int x = 0; x < imageXAxisLength; ++x) {
+            if(image[y*imageXAxisLength+x] != 0) {
+                qImage.setPixel(x, y, qRgb(image[y*imageXAxisLength+x], image[y*imageXAxisLength+x], image[y*imageXAxisLength+x]));
+            }
+        }
+    }
 }
 }
