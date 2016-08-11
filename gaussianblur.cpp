@@ -13,7 +13,7 @@ int* applyGausianBlur(int* image, int imageXLen, int imageYLen, float sigma, int
 
     int* blurredImage = mcgbri004::applyImageFilter(image, imageXLen, imageYLen, gausianMatrix, w);
 
-    delete gausianMatrix;
+    delete[] gausianMatrix;
     return blurredImage;
 }
 

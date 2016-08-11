@@ -16,9 +16,9 @@ EdgeDetection::EdgeDetection(int* image, int imageXLen, int imageYLen) {
 }
 
 EdgeDetection::~EdgeDetection() {
-    delete magnitudeImage;
-    delete directions;
-    delete edgeDetectionImage;
+    delete[] magnitudeImage;
+    delete[] directions;
+    delete[] edgeDetectionImage;
 }
 
 int* EdgeDetection::getMagnitudeImageRef() {
@@ -56,8 +56,8 @@ void EdgeDetection::determineMagnitudeImage() {
             magnitudeImage[y*imageXLen + x] = round(sqrt(pow(xDeltaImage[y*imageXLen + x], 2) + pow(yDeltaImage[y*imageXLen + x], 2)));
         }
     }
-    delete xDeltaImage;
-    delete yDeltaImage;
+    delete[] xDeltaImage;
+    delete[] yDeltaImage;
 }
 
 void EdgeDetection::determineEdgeDetection() {
@@ -185,7 +185,7 @@ void EdgeDetection::determineEdgeDetection() {
             }
         }
     }
-    delete magnitudes;
-    delete roundedDirections;
+    delete[] magnitudes;
+    delete[] roundedDirections;
 }
 }
