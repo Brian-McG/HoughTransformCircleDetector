@@ -74,6 +74,7 @@ void EdgeDetection::determineEdgeDetection() {
     int* xDeltaImage = applyImageFilter(image, imageXLen, imageYLen, xDeltaMatrix, w);
     int* yDeltaImage = applyImageFilter(image, imageXLen, imageYLen, yDeltaMatrix, w);
     float* magnitudes = new float[imageYLen*imageXLen];
+    std::fill(magnitudes, magnitudes + imageYLen*imageXLen, 0);
     directions = new float[imageYLen*imageXLen];
     int* roundedDirections = new int[imageYLen*imageXLen];
     float maxMagnitude = -1.0f;
@@ -111,7 +112,9 @@ void EdgeDetection::determineEdgeDetection() {
     }
 
     edgeDetectionImage = new int[imageYLen*imageXLen];
+    std::fill(edgeDetectionImage, edgeDetectionImage + imageYLen * imageXLen, 0);
     int* edgeDetectionImageTmp = new int[imageYLen*imageXLen];
+    std::fill(edgeDetectionImageTmp, edgeDetectionImageTmp + imageYLen * imageXLen, 0);
     for (int y = 0; y < imageYLen; ++y) {
         for(int x =0; x < imageXLen; ++x) {
             char isMaximum = 0;
@@ -185,6 +188,7 @@ void EdgeDetection::determineEdgeDetection() {
             }
         }
     }
+    delete[] edgeDetectionImageTmp;
     delete[] magnitudes;
     delete[] roundedDirections;
 }
