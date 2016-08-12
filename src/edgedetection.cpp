@@ -133,9 +133,7 @@ void EdgeDetection::determineEdgeDetection() {
 
     // Apply non-maximal suppression and use a double threshold
     edgeDetectionImage = new int[imageYLen*imageXLen];
-    std::fill_n(edgeDetectionImage, imageYLen * imageXLen, 0);
     int* edgeDetectionImageTmp = new int[imageYLen*imageXLen];
-    std::fill_n(edgeDetectionImageTmp, imageYLen * imageXLen, 0);
     for (int y = 0; y < imageYLen; ++y) {
         for(int x =0; x < imageXLen; ++x) {
             char isMaximum = 0;
