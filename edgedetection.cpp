@@ -74,13 +74,12 @@ void EdgeDetection::determineEdgeDetection() {
     int* xDeltaImage = applyImageFilter(image, imageXLen, imageYLen, xDeltaMatrix, w);
     int* yDeltaImage = applyImageFilter(image, imageXLen, imageYLen, yDeltaMatrix, w);
     float* magnitudes = new float[imageYLen*imageXLen];
-    std::fill(magnitudes, magnitudes + imageYLen*imageXLen, 0);
     directions = new float[imageYLen*imageXLen];
     int* roundedDirections = new int[imageYLen*imageXLen];
     float maxMagnitude = -1.0f;
     for (int y = 0; y < imageYLen; ++y) {
         for(int x =0; x < imageXLen; ++x) {
-            magnitudes[y*imageXLen + x] = sqrt(pow(xDeltaImage[y*imageXLen + x], 2) + pow(yDeltaImage[y*imageXLen + x], 2));
+            magnitudes[y*imageXLen + x] = pow(xDeltaImage[y*imageXLen + x], 2) + pow(yDeltaImage[y*imageXLen + x], 2);
             if (maxMagnitude < magnitudes[y*imageXLen + x]) {
                 maxMagnitude = magnitudes[y*imageXLen + x];
             }

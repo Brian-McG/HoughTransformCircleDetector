@@ -32,7 +32,7 @@ win32 {
 
     copyfiles.commands = mkdir $${DESTDIR_WIN}\\images & xcopy /S /I /E /Y $${PWD_WIN}\\images $${DESTDIR_WIN}\\images
 
-    RC_ICONS += icon-image-128.ico
+    RC_ICONS += icon.ico
 }
 macx {
     copydata.commands = cp -r $$PWD/images $$OUT_PWD
