@@ -1,20 +1,20 @@
 HEADERS       = \
-    gaussianblur.hpp \
-    window.hpp \
-    imagefilter.hpp \
-    edgedetection.hpp \
-    imageutil.hpp \
-    circlehoughtransform.hpp \
-    linedrawingutil.hpp
+    include/gaussianblur.hpp \
+    include/window.hpp \
+    include/imagefilter.hpp \
+    include/edgedetection.hpp \
+    include/imageutil.hpp \
+    include/circlehoughtransform.hpp \
+    include/circledrawingutil.hpp
 
-SOURCES       = main.cpp \
-                window.cpp \
-    gaussianblur.cpp \
-    imagefilter.cpp \
-    edgedetection.cpp \
-    imageutil.cpp \
-    circlehoughtransform.cpp \
-    linedrawingutil.cpp
+SOURCES       = src/main.cpp \
+                src/window.cpp \
+    src/gaussianblur.cpp \
+    src/imagefilter.cpp \
+    src/edgedetection.cpp \
+    src/imageutil.cpp \
+    src/circlehoughtransform.cpp \
+    src/circledrawingutil.cpp
 QT += core gui opengl widgets
 #RESOURCES += resources.qrc
 #QMAKE_CXXFLAGS += -DSHOULD_LOAD_SHADERS -std=c++11
