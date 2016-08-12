@@ -23,14 +23,14 @@ int getBoundryReflectedIndex(int imageAxisLength, int index) {
 }
 
 /**
- * Gets the value at specified indicies
+ * Gets the value at specified indices
  *
  * @param image             Pointer to image
  * @param imageXAxisLength  length of image along x-axis
  * @param imageYAxisLength  length of image along y-axis
  * @param x                 x index
  * @param y                 y index
- * @return value at specified indicies if within axis lengths, else returns 0
+ * @return value at specified indices if within axis lengths, else returns 0
  */
 float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLength, int x, int y) {
     if(y < 0 || x < 0) {
@@ -42,7 +42,7 @@ float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLe
 }
 
 /**
- * Gets the value at specified indicies
+ * Gets the value at specified indices
  *
  * @param image             Pointer to image
  * @param imageXAxisLength  length of image along x-axis
@@ -51,7 +51,7 @@ float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLe
  * @param x                 x index
  * @param y                 y index
  * @param z                 z index
- * @return value at specified indicies if within axis lengths, else returns 0
+ * @return value at specified indices if within axis lengths, else returns 0
  */
 float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int x, int y, int z) {
     if(y < 0 || x < 0 || z < 0) {
@@ -63,14 +63,14 @@ float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLe
 }
 
 /**
- * Gets the value at specified indicies
+ * Gets the value at specified indices
  *
  * @param image             Pointer to image
  * @param imageXAxisLength  length of image along x-axis
  * @param imageYAxisLength  length of image along y-axis
  * @param x                 x index
  * @param y                 y index
- * @return value at specified indicies if within axis lengths, else returns 0
+ * @return value at specified indices if within axis lengths, else returns 0
  */
 int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength, int x, int y) {
     if(y < 0 || x < 0) {
@@ -82,7 +82,7 @@ int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength
 }
 
 /**
- * Gets the value at specified indicies
+ * Gets the value at specified indices
  *
  * @param image             Pointer to image
  * @param imageXAxisLength  length of image along x-axis
@@ -91,7 +91,7 @@ int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength
  * @param x                 x index
  * @param y                 y index
  * @param z                 z index
- * @return value at specified indicies if within axis lengths, else returns 0
+ * @return value at specified indices if within axis lengths, else returns 0
  */
 int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int x, int y, int z) {
     if(y < 0 || x < 0 || z < 0) {
@@ -103,14 +103,14 @@ int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength
 }
 
 /**
- * Gets the value at specified indicies
+ * Gets the value at specified indices
  *
  * @param image             Pointer to image
  * @param imageXAxisLength  length of image along x-axis
  * @param imageYAxisLength  length of image along x-axis
  * @param x                 x index
  * @param y                 y index
- * @return value at specified indicies if within axis lengths, else returns -1
+ * @return value at specified indices if within axis lengths, else returns -1
  */
 int getBoundryNegatedValue(int* image, int imageXAxisLength, int imageYAxisLength, int x, int y) {
     if(y < 0 || x < 0) {
@@ -122,7 +122,7 @@ int getBoundryNegatedValue(int* image, int imageXAxisLength, int imageYAxisLengt
 }
 
 /**
- * Increments value at specified indicies and supports overflow of image
+ * Increments value at specified indices and supports overflow of image
  *
  * @param image             Pointer to image
  * @param imageXAxisLength  length of image along x-axis

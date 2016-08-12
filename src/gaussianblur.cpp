@@ -8,7 +8,7 @@
 
 namespace mcgbri004 {
 /**
- * Applies a gausian blur to an image
+ * Applies a gaussian blur to an image
  *
  * @param image     Pointer to image
  * @param imageXLen Length along x-axis of image
@@ -17,24 +17,24 @@ namespace mcgbri004 {
  * @param w         Size of filter
  * @return          Pointer to blurred image
  */
-int* applyGausianBlur(int* image, int imageXLen, int imageYLen, float sigma, int w) {
-    float* gausianMatrix = getGausianMatrix(sigma, w);
+int* applyGaussianBlur(int* image, int imageXLen, int imageYLen, float sigma, int w) {
+    float* gaussianMatrix = getGaussianMatrix(sigma, w);
 
-    int* blurredImage = mcgbri004::applyImageFilter(image, imageXLen, imageYLen, gausianMatrix, w);
+    int* blurredImage = mcgbri004::applyImageFilter(image, imageXLen, imageYLen, gaussianMatrix, w);
 
-    delete[] gausianMatrix;
+    delete[] gaussianMatrix;
     return blurredImage;
 }
 
 /**
- * Calculates the values of the gausian filter
+ * Calculates the values of the gaussian filter
  *
  * @param sigma Amount of blur
  * @param w     Size of filter
- * @return      Pointer to gausian filter
+ * @return      Pointer to gaussian filter
  */
-float* getGausianMatrix(float sigma, int w) {
-    float* gausianMatrix = new float[w*w];
+float* getGaussianMatrix(float sigma, int w) {
+    float* gaussianMatrix = new float[w*w];
     float total = 0;
     int midpoint = w / 2;
 
@@ -43,27 +43,27 @@ float* getGausianMatrix(float sigma, int w) {
             int gausianXValue = abs(x - midpoint);
             int gausianYValue = abs(y - midpoint);
 
-            gausianMatrix[(y * w) + x] = getGausianValue(sigma, gausianXValue, gausianYValue);
-            total += gausianMatrix[(y * w) + x];
+            gaussianMatrix[(y * w) + x] = getGaussianValue(sigma, gausianXValue, gausianYValue);
+            total += gaussianMatrix[(y * w) + x];
         }
     }
     for (int y = 0; y < w; ++y) {
         for(int x = 0; x < w; ++x ) {
-            gausianMatrix[(y * w) + x] /= total;
+            gaussianMatrix[(y * w) + x] /= total;
         }
     }
 
-    return gausianMatrix;
+    return gaussianMatrix;
 }
 
 /**
  * @param sigma Amount of blur
  * @param x     x-value for matrix
  * @param y     y-value for matrix
- * @return      float which is the value of the gausian at x and y
+ * @return      float which is the value of the gaussian at x and y
  */
-float getGausianValue(float sigma, int x, int y) {
-    float gausianValue = (1/(2 * M_PI * pow(sigma, 2))) * exp(-1 *(pow(x, 2) + pow(y, 2)) / (2 * pow(sigma, 2)));
-    return gausianValue;
+float getGaussianValue(float sigma, int x, int y) {
+    float gaussianValue = (1/(2 * M_PI * pow(sigma, 2))) * exp(-1 *(pow(x, 2) + pow(y, 2)) / (2 * pow(sigma, 2)));
+    return gaussianValue;
 }
 }

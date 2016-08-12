@@ -161,7 +161,7 @@ void window::addConections() {
 void window::open(QString & filePath) {
     // Open file dialog if no file path provided
     if(filePath == "") {
-        filePath = QFileDialog::getOpenFileName(this, tr("Open image file"), "", tr("Supported Images (*.pgm *.ppm *.pbm *.jpeg *.jpg *.gif)"));
+        filePath = QFileDialog::getOpenFileName(this, tr("Open image file"), "", tr("Supported Images (*.pgm *.ppm *.pbm *.jpeg *.jpg *.png)"));
     } if(filePath != "") {
         QPixmap originalPixmap(filePath);
 
@@ -178,7 +178,7 @@ void window::open(QString & filePath) {
         }
 
         // Blur image
-        int* blurredMatrix = mcgbri004::applyGausianBlur(matrix, width, height, 1.4, 5);
+        int* blurredMatrix = mcgbri004::applyGaussianBlur(matrix, width, height, 1.4, 5);
         smoothedImage = QImage(width, height, QImage::Format_RGB32);
         setQImage(smoothedImage, blurredMatrix, width, height);
 
@@ -192,7 +192,6 @@ void window::open(QString & filePath) {
         int* edgeMatrix =  edgeDetector->getEdgeDetectionImageRef();
         edgeDetectionImage = QImage(width, height, QImage::Format_RGB32);
         setQImage(edgeDetectionImage, edgeMatrix, width, height);
-        delete[] blurredMatrix;
 
         // circle detected image
         mcgbri004::CircleHoughTransform * circleHoughTransform = new mcgbri004::CircleHoughTransform(edgeDetector, width, height);
@@ -246,6 +245,7 @@ void window::open(QString & filePath) {
         QPixmap modifiedPixmap = QPixmap::fromImage(circleDetectionImage);
         prepareWindow(modifiedPixmap, false, 6);
 
+        delete[] blurredMatrix;
         delete[] matrix;
         delete edgeDetector;
         delete circleHoughTransform;
@@ -278,10 +278,14 @@ void window::save() {
         baseName = "image";
     }
 
-    QString fileName = QFileDialog::getSaveFileName(this, tr("Open image file"), (baseName+baseExt).c_str(), tr("Netpbm (*.pgm *.ppm *.pbm);;GIF (*.gif);;JPEG (*.jpg *.jpeg)"), &defaultFilter);
-    QString ext = QFileInfo(fileName).suffix();
-
-    imageLabel->pixmap()->save(fileName, ext.toStdString().c_str());
+    QString fileName = QFileDialog::getSaveFileName(this, tr("Open image file"), (baseName+baseExt).c_str(), tr("Netpbm (*.pgm *.ppm *.pbm);;PNG (*.png);;JPEG (*.jpg *.jpeg)"), &defaultFilter);
+    if(fileName.toStdString() != "") {
+        QString ext = QFileInfo(fileName).suffix();
+        bool savedSuccessful = imageLabel->pixmap()->save(fileName, ext.toStdString().c_str());
+        if(savedSuccessful == false) {
+            std::cout << "ERROR: Failed to save " << fileName.toStdString() << std::endl;
+        }
+    }
 }
 
 void window::selectInputImage() {
@@ -407,9 +411,8 @@ void window::setActionsVisibility(bool isVisible) {
 void window::setQImage(QImage & qImage, int* image, int imageXAxisLength, int imageYAxisLength) {
     for(int y = 0; y < imageYAxisLength; ++y) {
         for(int x = 0; x < imageXAxisLength; ++x) {
-            if(image[y*imageXAxisLength+x] != 0) {
-                qImage.setPixel(x, y, qRgb(image[y*imageXAxisLength+x], image[y*imageXAxisLength+x], image[y*imageXAxisLength+x]));
-            }
+            int value = image[y*imageXAxisLength+x];
+            qImage.setPixel(x, y, qRgb(value, value, value));
         }
     }
 }

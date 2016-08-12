@@ -43,7 +43,7 @@ void CircleHoughTransform::fillAccumulationLayer(int * accumulator, int rLength,
      * We add the points on both sides of the edge as there a few cases where only using one will fail.
      * We pick the two points that lie r length away from the edge point along the normal.
      *
-     * The accumulator has an overflow to allow the determination of partial circles on the boundries.
+     * The accumulator has an overflow to allow the determination of partial circles on the boundaries.
      */
     for (int y = 0; y < imageYLen; ++y) {
         for(int x =0; x < imageXLen; ++x) {
@@ -75,7 +75,7 @@ void CircleHoughTransform::fillAccumulationLayer(int * accumulator, int rLength,
             accumulatorImageMatrix[x + y*(imageXLen + (2 * xOverlap)) + (rLength - rStart)*(imageXLen + (2 * xOverlap))*(imageYLen + (2 * yOverlap))] = accumulatorValue;
 
             int accumulatorCriterion = 20;
-            // Provide more leaniant accumulation criterion for shapes on boundries which are small
+            // Provide more lenient accumulation criterion for shapes on boundaries which are small
             if(rLength < 25 && (x - xOverlap < 0 || y - yOverlap < 0 || x - xOverlap > imageXLen || y - yOverlap > imageYLen)) {
                 accumulatorCriterion = 5;
             } else {

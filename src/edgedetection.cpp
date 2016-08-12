@@ -91,6 +91,7 @@ void EdgeDetection::determineEdgeDetection() {
     float* magnitudes = new float[imageYLen*imageXLen];
     directions = new float[imageYLen*imageXLen];
     int* roundedDirections = new int[imageYLen*imageXLen];
+
     float maxMagnitude = -1.0f;
 
     /*
