@@ -22,7 +22,7 @@ window::window(QWidget *parent) : QMainWindow(parent), imageLabel(new QLabel), i
     addActions();
     addMenus();
     addConections();
-    QString fileName = "./images/testseq100136.pgm";
+    QString fileName = "./test_images/testseq100136.pgm";
     open(fileName);
     imageScrollArea->setVisible(true);
 }

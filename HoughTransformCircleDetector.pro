@@ -30,15 +30,15 @@ win32 {
     PWD_WIN ~= s,/,\\,g
     DESTDIR_WIN ~= s,/,\\,g
 
-    copyfiles.commands = mkdir $${DESTDIR_WIN}\\images & xcopy /S /I /E /Y $${PWD_WIN}\\images $${DESTDIR_WIN}\\images
+    copyfiles.commands = mkdir $${DESTDIR_WIN}\\test_images & xcopy /S /I /E /Y $${PWD_WIN}\\test_images $${DESTDIR_WIN}\\test_images
 
     RC_ICONS += icon.ico
 }
 macx {
-    copydata.commands = cp -r $$PWD/images $$OUT_PWD
+    copydata.commands = cp -r $$PWD/test_images $$OUT_PWD
 }
 unix {
-    copydata.commands = cp -r $$PWD/images $$OUT_PWD
+    copydata.commands = cp -r $$PWD/test_images $$OUT_PWD
 }
 QMAKE_EXTRA_TARGETS += copyfiles
 POST_TARGETDEPS += copyfiles
