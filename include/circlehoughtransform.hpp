@@ -18,12 +18,12 @@ private:
     int imageXLen; // X-axis length of the image
     int imageYLen; // Y-axis length of the image
     void fillAccumulationLayer(int* accumulator, int r, int rIndex);
-    int xOverlap;
-    int yOverlap;
+    int overlapAmount;
+    int accumulatorXLen;
+    int accumulatorYLen;
 
 public:
     // Various constants for the algorithm
-    const static int overlapProportion = 4;
     const static int rStart = 10;
     const static int rEnd = 61;
     const static int totalRLength = rEnd - rStart;
@@ -37,8 +37,9 @@ public:
     int* getAccumulatorImageMatrix();
     int* getFilteredAccumulatorImageMatrix();
     int* getCirclesInImage();
-    int getXOverlap();
-    int getYOverlap();
+    int getOverlapAmount();
+    int getAccumulatorXLen();
+    int getAccumulatorYLen();
 };
 }
 #endif // CIRCLEHOUGHTRANSFORM_HPP

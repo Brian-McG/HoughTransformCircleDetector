@@ -58,10 +58,10 @@ int* EdgeDetection::getEdgeDetectionImageRef() {
  * Determines the magnitude image
  */
 void EdgeDetection::determineMagnitudeImage() {
-    // Use Intel's IPP definition of a 5x5 sobel filter (https://software.intel.com/en-us/node/504204):
     int w = 5;
-    float xDeltaMatrix[] = {-1, -2, 0, -2, -1, -4, -8, 0, 8, 4, -6, -12, 0, 12, 6, -4, -8, 0, 8, 4, -1, -2, 0, 2, 1};
-    float yDeltaMatrix[] = {-1, -4, -6, -4, -1, -2, -8, -12, -8, -2, 0, 0, 0, 0, 0, 2,  8, 12, 8, 2, 1, 4, 6, 4, 1};
+    // 5x5 Sobel filter
+    float xDeltaMatrix[] = {2, 1, 0, -1, -2, 3, 2, 0, -2, -3, 4, 3, 0, -3, -4, 3, 2, 0, -2, -3, 2, 1, 0, -1, -2};
+    float yDeltaMatrix[] = {2, 3, 4, 3, 2, 1, 2, 3, 2, 1, 0, 0, 0, 0, 0, -1, -2, -3, -2, -1, -2, -3, -4, -3, -2};
 
     int* xDeltaImage = applyImageFilter(image, imageXLen, imageYLen, xDeltaMatrix, w);
     int* yDeltaImage = applyImageFilter(image, imageXLen, imageYLen, yDeltaMatrix, w);
@@ -79,8 +79,8 @@ void EdgeDetection::determineMagnitudeImage() {
  * Determines the edge detection image using the canny edge detector
  */
 void EdgeDetection::determineEdgeDetection() {
-    // Use Intel's IPP definition of a 5x5 sobel filter (https://software.intel.com/en-us/node/504204):
     int w = 5;
+    // 5x5 Sobel filter
     float xDeltaMatrix[] = {2, 1, 0, -1, -2, 3, 2, 0, -2, -3, 4, 3, 0, -3, -4, 3, 2, 0, -2, -3, 2, 1, 0, -1, -2};
     float yDeltaMatrix[] = {2, 3, 4, 3, 2, 1, 2, 3, 2, 1, 0, 0, 0, 0, 0, -1, -2, -3, -2, -1, -2, -3, -4, -3, -2};
 

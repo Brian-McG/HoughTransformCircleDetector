@@ -208,15 +208,15 @@ void window::open(QString & filePath) {
         }
 
         // Accumulator images
-        int xOverlap = circleHoughTransform->getXOverlap();
-        int yOverlap = circleHoughTransform->getYOverlap();
+        int accumulatorXLen = circleHoughTransform->getAccumulatorXLen();
+        int accumulatorYLen = circleHoughTransform->getAccumulatorYLen();
         accumulatorImages = new QImage[circleHoughTransform->totalRLength];
         int* imageMatrix = circleHoughTransform->getAccumulatorImageMatrix();
         for(int r = 0; r < circleHoughTransform->totalRLength; ++r) {
-            accumulatorImages[r] = QImage(width + (2 * xOverlap), height + (2 * yOverlap), QImage::Format_RGB32);
-            for(int j = 0; j < height + (2 * yOverlap); j++) {
-                for(int i = 0; i < width + (2 * xOverlap); i++) {
-                    if(imageMatrix[r*(width + (2 * xOverlap))*(height + (2 * yOverlap)) + j*(width + (2 * xOverlap))+i] > 0) {
+            accumulatorImages[r] = QImage(accumulatorXLen, accumulatorYLen, QImage::Format_RGB32);
+            for(int j = 0; j < accumulatorYLen; j++) {
+                for(int i = 0; i < accumulatorXLen; i++) {
+                    if(imageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i] > 0) {
                         accumulatorImages[r].setPixel(i, j, qRgb(255, 0, 0));
                     } else {
                         accumulatorImages[r].setPixel(i, j, qRgb(0, 0, 0));
@@ -229,10 +229,10 @@ void window::open(QString & filePath) {
         filteredAccumulatorImages = new QImage[circleHoughTransform->totalRLength];
         int* filteredImageMatrix = circleHoughTransform->getFilteredAccumulatorImageMatrix();
         for(int r = 0; r < circleHoughTransform->totalRLength; ++r) {
-            filteredAccumulatorImages[r] = QImage(width + (2 * xOverlap), height + (2 * yOverlap), QImage::Format_RGB32);
-            for(int j = 0; j < height + (2 * yOverlap); j++) {
-                for(int i = 0; i < width + (2 * xOverlap); i++) {
-                    if(filteredImageMatrix[r*(width + (2 * xOverlap))*(height + (2 * yOverlap)) + j*(width + (2 * xOverlap))+i] > 0) {
+            filteredAccumulatorImages[r] = QImage(accumulatorXLen, accumulatorYLen, QImage::Format_RGB32);
+            for(int j = 0; j < accumulatorYLen; j++) {
+                for(int i = 0; i < accumulatorXLen; i++) {
+                    if(filteredImageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i] > 0) {
                         filteredAccumulatorImages[r].setPixel(i, j, qRgb(255, 0, 0));
                     } else {
                         filteredAccumulatorImages[r].setPixel(i, j, qRgb(0, 0, 0));
@@ -242,8 +242,8 @@ void window::open(QString & filePath) {
         }
 
         // Present the circle detected image by default
-        QPixmap modifiedPixmap = QPixmap::fromImage(circleDetectionImage);
-        prepareWindow(modifiedPixmap, false, 6);
+        selectCircleDetectionImage();
+
 
         delete[] blurredMatrix;
         delete[] matrix;

@@ -128,22 +128,20 @@ int getBoundryNegatedValue(int* image, int imageXAxisLength, int imageYAxisLengt
  * @param imageXAxisLength  length of image along x-axis
  * @param imageYAxisLength  length of image along y-axis
  * @param imageZAxisLength  length of image along z-axis
- * @param overlapProportion proportion of overlap for each axis
+ * @param overlapAmount     Ammount of overlap for each axis
  * @param x                 x index
  * @param y                 y index
  * @param z                 z index
  */
-void incrementWithOverflow(int* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int overlapProportion, int x, int y, int z) {
-    int xOverlap = imageXAxisLength / overlapProportion;
-    int yOverlap = imageYAxisLength / overlapProportion;
+void incrementWithOverflow(int* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int overlapAmount, int x, int y, int z) {
     if(z < 0 || z >= imageZAxisLength) {
         std::cout << "WARNING: <incrementWithOverlap> invalid z input" << std::endl;
         return;
     }
-    if (y < -yOverlap || x < -xOverlap || x > imageXAxisLength + xOverlap || y > imageYAxisLength + yOverlap) {
+    if (y < -overlapAmount || x < -overlapAmount || x > imageXAxisLength + overlapAmount || y > imageYAxisLength + overlapAmount) {
         std::cout << "WARNING: (incrementWithOverlap) outside overlap boundries" << std::endl;
         return;
     }
-    ++image[(y + yOverlap)*(imageXAxisLength + 2 * xOverlap) + (x + xOverlap) + z*(imageXAxisLength + 2 * xOverlap)*(imageYAxisLength + 2 * yOverlap)];
+    ++image[(y + overlapAmount)*(imageXAxisLength + 2 * overlapAmount) + (x + overlapAmount) + z*(imageXAxisLength + 2 * overlapAmount)*(imageYAxisLength + 2 * overlapAmount)];
 }
 }
