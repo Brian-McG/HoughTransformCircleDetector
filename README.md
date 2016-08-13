@@ -31,4 +31,4 @@ Please note that for the bonus visualization marks we have store the full 3D acc
 
   - The refactoring to support partial circles meant that the accumulator needed to be extended. It created a number of bugs where incorrect indices were accessed. Finding the bugs was time consuming.
 
- - When the optimized accumulator was implemented I failed to realize that rWindow * 2 + 1 indices were required, I used rWindow * 2 which resulted in various bugs and errors. Again this took some time to identify and rectify as indexing bugs were also present.
+  - When the optimized accumulator was implemented I failed to realize that rWindow * 2 + 1 indices were required, I used rWindow * 2 which resulted in various bugs and errors. Again this took some time to identify and rectify as indexing bugs were also present.
