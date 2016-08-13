@@ -21,7 +21,7 @@ window::window(QWidget *parent) : QMainWindow(parent), imageLabel(new QLabel), i
     setUpWidget();
     addActions();
     addMenus();
-    addConections();
+    addConnections();
     QString fileName = "./test_images/testseq100136.pgm";
     open(fileName);
     imageScrollArea->setVisible(true);
@@ -140,7 +140,7 @@ void window::addMenus() {
 /**
  * Connect actions to various functions
  */
-void window::addConections() {
+void window::addConnections() {
     connect(openAction, &QAction::triggered, this, [this]{QString fileName = ""; open(fileName); });
     connect(saveAction, SIGNAL(triggered()), this, SLOT(save()));
     connect(inputImageAction, SIGNAL(triggered()), this, SLOT(selectInputImage()));
@@ -299,7 +299,7 @@ void window::selectSmoothedImage() {
     QPixmap modifiedPixmap = QPixmap::fromImage(smoothedImage);
     prepareWindow(modifiedPixmap, false, 1);
     smoothedImageAction->setChecked(true);
-    imageDescriptionLabel->setText("Gausian Blurred Image");
+    imageDescriptionLabel->setText("Gaussian Blurred Image");
 }
 
 void window::selectMagnitudeImage() {
@@ -373,9 +373,9 @@ void window::prepareWindow(QPixmap & pixmap, bool isAccumulator, int currentSele
     if(isAccumulator) {
         std::string labelText = "Accumulator with radius set to " + std::to_string(rLength);
         sliderLabel->setText(labelText.c_str());
-        resize(width + accumulatorWidthExtention, height + accumulatorHeightExtention);
+        resize(width + accumulatorWidthExtension, height + accumulatorHeightExtension);
     } else {
-        resize(width + regularWidthExtention, height + regularHeightExtention);
+        resize(width + regularWidthExtension, height + regularHeightExtension);
     }
     currentImageSelection = currentSelection;
     setActionsVisibility(false);

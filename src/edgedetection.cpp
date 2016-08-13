@@ -145,26 +145,26 @@ void EdgeDetection::determineEdgeDetection() {
             }
             if(maximumValue != 0) {
                 if(roundedDirections[y*imageXLen + x] == 0) {
-                    float mag1 = getBoundryZeroedValue(magnitudes, imageXLen, imageYLen, x + 1, y);
-                    float mag2 = getBoundryZeroedValue(magnitudes, imageXLen, imageYLen, x - 1, y);
+                    float mag1 = getBoundaryZeroedValue(magnitudes, imageXLen, imageYLen, x + 1, y);
+                    float mag2 = getBoundaryZeroedValue(magnitudes, imageXLen, imageYLen, x - 1, y);
                     if(mag1 < magnitudes[y*imageXLen + x] && mag2 < magnitudes[y*imageXLen + x]) {
                         isMaximum = maximumValue;
                     }
                 } else if(roundedDirections[y*imageXLen + x] == 45) {
-                    float mag1 = getBoundryZeroedValue(magnitudes, imageXLen, imageYLen, x - 1, y - 1);
-                    float mag2 = getBoundryZeroedValue(magnitudes, imageXLen, imageYLen, x + 1, y + 1);
+                    float mag1 = getBoundaryZeroedValue(magnitudes, imageXLen, imageYLen, x - 1, y - 1);
+                    float mag2 = getBoundaryZeroedValue(magnitudes, imageXLen, imageYLen, x + 1, y + 1);
                     if(mag1 < magnitudes[y*imageXLen + x] && mag2 < magnitudes[y*imageXLen + x]) {
                         isMaximum = maximumValue;
                     }
                 } else if (roundedDirections[y*imageXLen + x] == 90) {
-                    float mag1 = getBoundryZeroedValue(magnitudes, imageXLen, imageYLen, x, y + 1);
-                    float mag2 = getBoundryZeroedValue(magnitudes, imageXLen, imageYLen, x, y - 1);
+                    float mag1 = getBoundaryZeroedValue(magnitudes, imageXLen, imageYLen, x, y + 1);
+                    float mag2 = getBoundaryZeroedValue(magnitudes, imageXLen, imageYLen, x, y - 1);
                     if(mag1 < magnitudes[y*imageXLen + x] && mag2 < magnitudes[y*imageXLen + x]) {
                         isMaximum = maximumValue;
                     }
                 } else {
-                    float mag1 = getBoundryZeroedValue(magnitudes, imageXLen, imageYLen, x + 1, y - 1);
-                    float mag2 = getBoundryZeroedValue(magnitudes, imageXLen, imageYLen, x - 1, y + 1);
+                    float mag1 = getBoundaryZeroedValue(magnitudes, imageXLen, imageYLen, x + 1, y - 1);
+                    float mag2 = getBoundaryZeroedValue(magnitudes, imageXLen, imageYLen, x - 1, y + 1);
                     if(mag1 < magnitudes[y*imageXLen + x] && mag2 < magnitudes[y*imageXLen + x]) {
                         isMaximum = maximumValue;
                     }
@@ -189,14 +189,14 @@ void EdgeDetection::determineEdgeDetection() {
     for (int y = 0; y < imageYLen; ++y) {
         for(int x =0; x < imageXLen; ++x) {
             if(edgeDetectionImage[y*imageXLen + x] == -1) {
-                int boundaryValues[] = {getBoundryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x + 1, y),
-                                        getBoundryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x - 1, y),
-                                        getBoundryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x + 1, y - 1),
-                                        getBoundryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x - 1, y + 1),
-                                        getBoundryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x, y + 1),
-                                        getBoundryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x, y - 1),
-                                        getBoundryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x - 1, y - 1),
-                                        getBoundryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x + 1, y + 1)};
+                int boundaryValues[] = {getBoundaryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x + 1, y),
+                                        getBoundaryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x - 1, y),
+                                        getBoundaryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x + 1, y - 1),
+                                        getBoundaryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x - 1, y + 1),
+                                        getBoundaryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x, y + 1),
+                                        getBoundaryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x, y - 1),
+                                        getBoundaryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x - 1, y - 1),
+                                        getBoundaryZeroedValue(edgeDetectionImageTmp, imageXLen, imageYLen, x + 1, y + 1)};
                 edgeDetectionImage[y*imageXLen + x] = 0;
                 for(int i = 0; i < 8; ++i) {
                     if(boundaryValues[i] == 255) {

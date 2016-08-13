@@ -36,16 +36,16 @@ private slots:
     void selectCircleDetectionImage();
 
 private:
-    const int regularWidthExtention = 20;
-    const int regularHeightExtention = 60;
-    const int accumulatorWidthExtention = 162;
-    const int accumulatorHeightExtention = 300;
+    const int regularWidthExtension = 20;
+    const int regularHeightExtension = 60;
+    const int accumulatorWidthExtension = 162;
+    const int accumulatorHeightExtension = 300;
     QLabel *imageLabel;
     QScrollArea *imageScrollArea;
     int currentImageSelection;
     void addActions();
     void addMenus();
-    void addConections();
+    void addConnections();
     void setUpWidget();
     int height;
     int width;

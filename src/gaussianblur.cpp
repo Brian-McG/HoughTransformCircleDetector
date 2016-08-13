@@ -40,10 +40,10 @@ float* getGaussianMatrix(float sigma, int w) {
 
     for (int y = 0; y < w; ++y) {
         for(int x = 0; x < w; ++x ) {
-            int gausianXValue = abs(x - midpoint);
-            int gausianYValue = abs(y - midpoint);
+            int gaussianXValue = abs(x - midpoint);
+            int gaussianYValue = abs(y - midpoint);
 
-            gaussianMatrix[(y * w) + x] = getGaussianValue(sigma, gausianXValue, gausianYValue);
+            gaussianMatrix[(y * w) + x] = getGaussianValue(sigma, gaussianXValue, gaussianYValue);
             total += gaussianMatrix[(y * w) + x];
         }
     }

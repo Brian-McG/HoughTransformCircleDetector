@@ -12,7 +12,7 @@ namespace mcgbri004 {
  * @param index             Index along axis
  * @return                  Reflected index about the axis
  */
-int getBoundryReflectedIndex(int imageAxisLength, int index) {
+int getBoundaryReflectedIndex(int imageAxisLength, int index) {
     if(index < 0) {
         index = abs(index + 1);
     } else if (index >= imageAxisLength) {
@@ -32,7 +32,7 @@ int getBoundryReflectedIndex(int imageAxisLength, int index) {
  * @param y                 y index
  * @return value at specified indices if within axis lengths, else returns 0
  */
-float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLength, int x, int y) {
+float getBoundaryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLength, int x, int y) {
     if(y < 0 || x < 0) {
         return 0;
     } else if (y >= imageYAxisLength || x >= imageXAxisLength) {
@@ -53,7 +53,7 @@ float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLe
  * @param z                 z index
  * @return value at specified indices if within axis lengths, else returns 0
  */
-float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int x, int y, int z) {
+float getBoundaryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int x, int y, int z) {
     if(y < 0 || x < 0 || z < 0) {
         return 0;
     } else if (y >= imageYAxisLength || x >= imageXAxisLength || z >= imageZAxisLength) {
@@ -72,7 +72,7 @@ float getBoundryZeroedValue(float* image, int imageXAxisLength, int imageYAxisLe
  * @param y                 y index
  * @return value at specified indices if within axis lengths, else returns 0
  */
-int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength, int x, int y) {
+int getBoundaryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength, int x, int y) {
     if(y < 0 || x < 0) {
         return 0;
     } else if (y >= imageYAxisLength || x >= imageXAxisLength) {
@@ -93,7 +93,7 @@ int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength
  * @param z                 z index
  * @return value at specified indices if within axis lengths, else returns 0
  */
-int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int x, int y, int z) {
+int getBoundaryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength, int imageZAxisLength, int x, int y, int z) {
     if(y < 0 || x < 0 || z < 0) {
         return 0;
     } else if (y >= imageYAxisLength || x >= imageXAxisLength || z >= imageZAxisLength) {
@@ -112,7 +112,7 @@ int getBoundryZeroedValue(int* image, int imageXAxisLength, int imageYAxisLength
  * @param y                 y index
  * @return value at specified indices if within axis lengths, else returns -1
  */
-int getBoundryNegatedValue(int* image, int imageXAxisLength, int imageYAxisLength, int x, int y) {
+int getBoundaryNegatedValue(int* image, int imageXAxisLength, int imageYAxisLength, int x, int y) {
     if(y < 0 || x < 0) {
         return -1;
     } else if (y >= imageYAxisLength || x >= imageXAxisLength) {
@@ -128,7 +128,7 @@ int getBoundryNegatedValue(int* image, int imageXAxisLength, int imageYAxisLengt
  * @param imageXAxisLength  length of image along x-axis
  * @param imageYAxisLength  length of image along y-axis
  * @param imageZAxisLength  length of image along z-axis
- * @param overlapAmount     Ammount of overlap for each axis
+ * @param overlapAmount     Amount of overlap for each axis
  * @param x                 x index
  * @param y                 y index
  * @param z                 z index
@@ -139,7 +139,7 @@ void incrementWithOverflow(int* image, int imageXAxisLength, int imageYAxisLengt
         return;
     }
     if (y < -overlapAmount || x < -overlapAmount || x > imageXAxisLength + overlapAmount || y > imageYAxisLength + overlapAmount) {
-        std::cout << "WARNING: (incrementWithOverlap) outside overlap boundries" << std::endl;
+        std::cout << "WARNING: (incrementWithOverlap) outside overlap boundaries" << std::endl;
         return;
     }
     ++image[(y + overlapAmount)*(imageXAxisLength + 2 * overlapAmount) + (x + overlapAmount) + z*(imageXAxisLength + 2 * overlapAmount)*(imageYAxisLength + 2 * overlapAmount)];

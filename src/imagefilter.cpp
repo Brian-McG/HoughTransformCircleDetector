@@ -31,8 +31,8 @@ int* applyImageFilter(int* image, int imageXLen, int imageYLen, float* filter, i
                     int indexY = y + filterYValue;
 
                     // Reflect the boundaries
-                    indexX = mcgbri004::getBoundryReflectedIndex(imageXLen, indexX);
-                    indexY = mcgbri004::getBoundryReflectedIndex(imageYLen, indexY);
+                    indexX = mcgbri004::getBoundaryReflectedIndex(imageXLen, indexX);
+                    indexY = mcgbri004::getBoundaryReflectedIndex(imageYLen, indexY);
 
                     pixelValue += image[(indexY*imageXLen) + indexX] * filter[(matrixY*w) + matrixX];
                 }

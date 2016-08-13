@@ -84,7 +84,7 @@ void CircleHoughTransform::fillAccumulationLayer(int * accumulator, int rLength,
                 // We evaluate neighbouring pixels too since we are using a discrete value of r so we assume there could be some inaccuracies
                 for(int yDelta = -pixelWindow; yDelta <= pixelWindow; ++yDelta) {
                     for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
-                        if(getBoundryNegatedValue(evaluationMatrix, accumulatorXLen, accumulatorYLen, x+xDelta, y+yDelta) == 0) {
+                        if(getBoundaryNegatedValue(evaluationMatrix, accumulatorXLen, accumulatorYLen, x+xDelta, y+yDelta) == 0) {
                             // Produce a test circle to evaluate
                             std::vector<std::pair<int, int>> circleCoordinates = produceCircleCoordinatesForImage(imageXLen, imageYLen, (x + xDelta) - overlapAmount, (y + yDelta) - overlapAmount, rLength);
 
@@ -156,7 +156,7 @@ int* CircleHoughTransform::getCirclesInImage() {
                                 for (int rDelta = -rWindow; rDelta <= rWindow; ++rDelta) {
                                     if(r - rStart + rDelta >= 0 && r + rDelta < rEnd) {
                                         const int windowRDeltaIndex = (r - rStart + rDelta) % accumulatorRBufferLen;
-                                        int localValue = getBoundryZeroedValue(accumulator, accumulatorXLen, accumulatorYLen, accumulatorRBufferLen, x+xDelta, y+yDelta, windowRDeltaIndex);
+                                        int localValue = getBoundaryZeroedValue(accumulator, accumulatorXLen, accumulatorYLen, accumulatorRBufferLen, x+xDelta, y+yDelta, windowRDeltaIndex);
                                         int valueCriterion = 49;
                                         if((x+xDelta) - overlapAmount < 0 || (y+yDelta) - overlapAmount < 0 || (x+xDelta) - overlapAmount > imageXLen || (y+yDelta) - overlapAmount > imageYLen) {
                                             valueCriterion = 60;
@@ -256,7 +256,7 @@ float evaluateCandidateCircle(EdgeDetection* edgeDetector, int imageXLen, int im
         for(int yDelta = -pixelWindow; yDelta <= pixelWindow; ++yDelta) {
             for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
 
-                int value = getBoundryZeroedValue(edgeImage, imageXLen, imageYLen, circleCoordinates.at(i).first + xDelta, circleCoordinates.at(i).second+yDelta);
+                int value = getBoundaryZeroedValue(edgeImage, imageXLen, imageYLen, circleCoordinates.at(i).first + xDelta, circleCoordinates.at(i).second+yDelta);
                 if(value == 255 && !found) {
                     ++correctEvaluations;
                     found = true;
