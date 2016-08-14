@@ -24,12 +24,12 @@ private:
 
 public:
     // Various constants for the algorithm
-    const static int rStart = 10;
-    const static int rEnd = 61;
-    const static int totalRLength = rEnd - rStart;
-    const static int rWindow = 5;
-    const static int pixelWindow = 3;
-    const static int accumulatorRBufferLen = (2 * rWindow) + 1;
+    const static int R_START = 10;
+    const static int R_END = 61;
+    const static int TOTAL_R_LENGTH = R_END - R_START;
+    const static int R_WINDOW = 5;
+    const static int PIXEL_WINDOW = 3;
+    const static int ACCUMULATOR_R_BUFFER_LEN = (2 * R_WINDOW) + 1;
 
     virtual ~CircleHoughTransform();
     CircleHoughTransform(EdgeDetection* edgeDetector, int imageXLen, int imageYLen);

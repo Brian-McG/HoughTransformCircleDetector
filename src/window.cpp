@@ -27,11 +27,12 @@ window::window(QWidget *parent) : QMainWindow(parent), imageLabel(new QLabel), i
     imageScrollArea->setVisible(true);
 }
 
-window::~window() { 
+window::~window() {
     delete openAction;
     delete saveAction;
     delete inputImageAction;
     delete smoothedImageAction;
+    delete magnitudeImageAction;
     delete edgeDetectionImageAction;
     delete accumulatorImageAction;
     delete filteredAccumulatorImageAction;
@@ -43,6 +44,7 @@ window::~window() {
     delete accumulatorSlider;
     delete layout;
     delete sliderLabel;
+    delete imageDescriptionLabel;
     delete qLayoutWidget;
     delete[] accumulatorImages;
     delete[] filteredAccumulatorImages;
@@ -84,6 +86,7 @@ void window::setUpWidget() {
     // Set layout in QWidget
     qLayoutWidget = new QWidget();
     qLayoutWidget->setLayout(layout);
+    qLayoutWidget->activateWindow();
 
     // Set QWidget as the central layout of the main window
     setCentralWidget(qLayoutWidget);
@@ -192,6 +195,7 @@ void window::open(QString & filePath) {
         int* edgeMatrix =  edgeDetector->getEdgeDetectionImageRef();
         edgeDetectionImage = QImage(width, height, QImage::Format_RGB32);
         setQImage(edgeDetectionImage, edgeMatrix, width, height);
+        delete[] blurredMatrix;
 
         // circle detected image
         mcgbri004::CircleHoughTransform * circleHoughTransform = new mcgbri004::CircleHoughTransform(edgeDetector, width, height);
@@ -206,6 +210,7 @@ void window::open(QString & filePath) {
                 }
             }
         }
+        delete[] matrix;
 
         // Accumulator images
         int accumulatorXLen = circleHoughTransform->getAccumulatorXLen();
@@ -240,15 +245,11 @@ void window::open(QString & filePath) {
                 }
             }
         }
+        delete edgeDetector;
+        delete circleHoughTransform;
 
         // Present the circle detected image by default
         selectCircleDetectionImage();
-
-
-        delete[] blurredMatrix;
-        delete[] matrix;
-        delete edgeDetector;
-        delete circleHoughTransform;
     }
 }
 
@@ -291,7 +292,7 @@ void window::save() {
 void window::selectInputImage() {
     QPixmap modifiedPixmap = QPixmap::fromImage(inputImage);
     prepareWindow(modifiedPixmap, false, 0);
-    inputImageAction->setChecked(true);    
+    inputImageAction->setChecked(true);
     imageDescriptionLabel->setText("Input Image");
 }
 

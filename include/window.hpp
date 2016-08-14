@@ -28,7 +28,7 @@ private slots:
     void save();
     void selectInputImage();
     void selectSmoothedImage();
-    void selectMagnitudeImage();    
+    void selectMagnitudeImage();
     void selectEdgeDetectionImage();
     void selectAccumulatorImage(int rLength);
     void selectFilteredAccumulatorImage(int rLength);
@@ -38,8 +38,8 @@ private slots:
 private:
     const int regularWidthExtension = 20;
     const int regularHeightExtension = 60;
-    const int accumulatorWidthExtension = 162;
-    const int accumulatorHeightExtension = 300;
+    const int accumulatorWidthExtension = 142;
+    const int accumulatorHeightExtension = 234;
     QLabel *imageLabel;
     QScrollArea *imageScrollArea;
     int currentImageSelection;
@@ -74,7 +74,7 @@ private:
     QImage circleDetectionImage;
     QLabel *imageDescriptionLabel;
 
-    QLabel * sliderLabel;    
+    QLabel * sliderLabel;
     QSlider *accumulatorSlider;
     QVBoxLayout *layout;  
     double scaleFactor;

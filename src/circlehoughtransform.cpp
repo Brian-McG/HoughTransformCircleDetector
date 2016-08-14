@@ -24,6 +24,7 @@ CircleHoughTransform::CircleHoughTransform(EdgeDetection* edgeDetector, int imag
 CircleHoughTransform::~CircleHoughTransform() {
     delete[] circleDetectionImage;
     delete[] accumulatorImageMatrix;
+    delete[] filteredAccumulatorImageMatrix;
 }
 
 /**
@@ -58,8 +59,8 @@ void CircleHoughTransform::fillAccumulationLayer(int * accumulator, int rLength,
     }
 
     /*
-     * Evaluate the accumulation slide, filtering out small accumulation values.
-     * For the values that pass the filter, evaluate how well a circle with the input r length matches the already defined edges.
+     * Evaluate the accumulation slice, filtering out small accumulation values.
+     * For the values that pass the filter, evaluate how well a circle with radius r matches the already defined edges.
      * The accumulator slice is transformed into a score from 0 - 100 defining how well the circle fits.
      *
      * It is important to note that accumulatorImageMatrix and filteredAccumulatorImageMatrix play no role in the algorithm and are only used for visualisation purposes.
