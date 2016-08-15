@@ -181,7 +181,7 @@ int* CircleHoughTransform::getCirclesInImage() {
             }
 
             /*
-             * We ensure that there are always rWindow accumulator layers above and below the current r
+             * We ensure that there are always R_WINDOW accumulator layers above and below the current r
              */
             if (r + 1 + R_WINDOW < R_END && r+1 > R_WINDOW) {
                 for (int y = 0; y < accumulatorYLen; ++y) {
@@ -247,15 +247,15 @@ int CircleHoughTransform::getAccumulatorYLen() {
  * @param circleCoordinates Circle coordinates
  * @return a float between 0 to 1 where 1 is a perfect match and 0 is no match
  */
-float evaluateCandidateCircle(EdgeDetection* edgeDetector, int imageXLen, int imageYLen, std::vector<std::pair<int, int>>& circleCoordinates, int pixelWindow) {
+float evaluateCandidateCircle(EdgeDetection* edgeDetector, int imageXLen, int imageYLen, std::vector<std::pair<int, int>>& circleCoordinates, int PIXEL_WINDOW) {
     int correctEvaluations = 0;
     int totalEvaluations = circleCoordinates.size();
     int* edgeImage = edgeDetector->getEdgeDetectionImageRef();
 
     for(int i = 0; i < totalEvaluations; ++i) {
         int found = false;
-        for(int yDelta = -pixelWindow; yDelta <= pixelWindow; ++yDelta) {
-            for (int xDelta = -pixelWindow; xDelta <= pixelWindow; ++xDelta) {
+        for(int yDelta = -PIXEL_WINDOW; yDelta <= PIXEL_WINDOW; ++yDelta) {
+            for (int xDelta = -PIXEL_WINDOW; xDelta <= PIXEL_WINDOW; ++xDelta) {
 
                 int value = getBoundaryZeroedValue(edgeImage, imageXLen, imageYLen, circleCoordinates.at(i).first + xDelta, circleCoordinates.at(i).second+yDelta);
                 if(value == 255 && !found) {
