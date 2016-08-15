@@ -222,7 +222,7 @@ void window::open(QString & filePath) {
             for(int j = 0; j < accumulatorYLen; j++) {
                 for(int i = 0; i < accumulatorXLen; i++) {
                     if(imageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i] > 0) {
-                        accumulatorImages[r].setPixel(i, j, qRgb(255, 0, 0));
+                        accumulatorImages[r].setPixel(i, j, qRgb(imageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i] * 10 + 50, 0, 0));
                     } else {
                         accumulatorImages[r].setPixel(i, j, qRgb(0, 0, 0));
                     }
@@ -238,7 +238,7 @@ void window::open(QString & filePath) {
             for(int j = 0; j < accumulatorYLen; j++) {
                 for(int i = 0; i < accumulatorXLen; i++) {
                     if(filteredImageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i] > 0) {
-                        filteredAccumulatorImages[r].setPixel(i, j, qRgb(255, 0, 0));
+                        filteredAccumulatorImages[r].setPixel(i, j, qRgb(filteredImageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i], 0, 0));
                     } else {
                         filteredAccumulatorImages[r].setPixel(i, j, qRgb(0, 0, 0));
                     }
