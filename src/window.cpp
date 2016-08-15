@@ -223,6 +223,9 @@ void window::open(QString & filePath) {
                 for(int i = 0; i < accumulatorXLen; i++) {
                     if(imageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i] > 0) {
                         int color = imageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i] * 15 + 30;
+                        if(color > 255) {
+                            color = 255;
+                        }
                         accumulatorImages[r].setPixel(i, j, qRgb(color, 0, 0));
                     } else {
                         accumulatorImages[r].setPixel(i, j, qRgb(0, 0, 0));
