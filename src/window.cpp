@@ -69,12 +69,12 @@ void window::setUpWidget() {
     accumulatorSlider->setFocusPolicy(Qt::StrongFocus);
     accumulatorSlider->setTickInterval(12);
     accumulatorSlider->setSingleStep(1);
-    accumulatorSlider->setMinimum(mcgbri004::CircleHoughTransform::rStart);
-    accumulatorSlider->setMaximum(mcgbri004::CircleHoughTransform::rEnd - 1);
+    accumulatorSlider->setMinimum(mcgbri004::CircleHoughTransform::R_START);
+    accumulatorSlider->setMaximum(mcgbri004::CircleHoughTransform::R_END - 1);
     accumulatorSlider->setVisible(false);
 
     sliderLabel = new QLabel;
-    std::string labelText = "Accumulator with radius set to " + std::to_string(mcgbri004::CircleHoughTransform::rStart);
+    std::string labelText = "Accumulator with radius set to " + std::to_string(mcgbri004::CircleHoughTransform::R_START);
     sliderLabel->setText(labelText.c_str());
     sliderLabel->setVisible(false);
     imageDescriptionLabel = new QLabel;
@@ -215,9 +215,9 @@ void window::open(QString & filePath) {
         // Accumulator images
         int accumulatorXLen = circleHoughTransform->getAccumulatorXLen();
         int accumulatorYLen = circleHoughTransform->getAccumulatorYLen();
-        accumulatorImages = new QImage[circleHoughTransform->totalRLength];
+        accumulatorImages = new QImage[circleHoughTransform->TOTAL_R_LENGTH];
         int* imageMatrix = circleHoughTransform->getAccumulatorImageMatrix();
-        for(int r = 0; r < circleHoughTransform->totalRLength; ++r) {
+        for(int r = 0; r < circleHoughTransform->TOTAL_R_LENGTH; ++r) {
             accumulatorImages[r] = QImage(accumulatorXLen, accumulatorYLen, QImage::Format_RGB32);
             for(int j = 0; j < accumulatorYLen; j++) {
                 for(int i = 0; i < accumulatorXLen; i++) {
@@ -231,9 +231,9 @@ void window::open(QString & filePath) {
         }
 
         // Filtered accumulator images
-        filteredAccumulatorImages = new QImage[circleHoughTransform->totalRLength];
+        filteredAccumulatorImages = new QImage[circleHoughTransform->TOTAL_R_LENGTH];
         int* filteredImageMatrix = circleHoughTransform->getFilteredAccumulatorImageMatrix();
-        for(int r = 0; r < circleHoughTransform->totalRLength; ++r) {
+        for(int r = 0; r < circleHoughTransform->TOTAL_R_LENGTH; ++r) {
             filteredAccumulatorImages[r] = QImage(accumulatorXLen, accumulatorYLen, QImage::Format_RGB32);
             for(int j = 0; j < accumulatorYLen; j++) {
                 for(int i = 0; i < accumulatorXLen; i++) {
@@ -318,14 +318,14 @@ void window::selectEdgeDetectionImage() {
 }
 
 void window::selectAccumulatorImage(int rLength) {
-    QPixmap modifiedPixmap = QPixmap::fromImage(accumulatorImages[rLength - mcgbri004::CircleHoughTransform::rStart]);
+    QPixmap modifiedPixmap = QPixmap::fromImage(accumulatorImages[rLength - mcgbri004::CircleHoughTransform::R_START]);
     prepareWindow(modifiedPixmap, true, 4, rLength);
     accumulatorImageAction->setChecked(true);
     imageDescriptionLabel->setText("Accumulator View");
 }
 
 void window::selectFilteredAccumulatorImage(int rLength) {
-    QPixmap modifiedPixmap = QPixmap::fromImage(filteredAccumulatorImages[rLength - mcgbri004::CircleHoughTransform::rStart]);
+    QPixmap modifiedPixmap = QPixmap::fromImage(filteredAccumulatorImages[rLength - mcgbri004::CircleHoughTransform::R_START]);
     prepareWindow(modifiedPixmap, true, 5, rLength);
     filteredAccumulatorImageAction->setChecked(true);
     imageDescriptionLabel->setText("Filtered Accumulator View");
