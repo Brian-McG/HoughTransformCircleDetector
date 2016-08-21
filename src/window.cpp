@@ -18,6 +18,8 @@
 #include "include/imageutil.hpp"
 
 window::window(QWidget *parent) : QMainWindow(parent), imageLabel(new QLabel), imageScrollArea(new QScrollArea), currentImageSelection(6) {
+    accumulatorImages = nullptr;
+    filteredAccumulatorImages = nullptr;
     setUpWidget();
     addActions();
     addMenus();
@@ -212,6 +214,13 @@ void window::open(QString & filePath) {
         }
         delete[] matrix;
 
+        if(accumulatorImages != nullptr) {
+            delete[] accumulatorImages;
+        } if(filteredAccumulatorImages != nullptr) {
+            delete[] filteredAccumulatorImages;
+        }
+
+
         // Accumulator images
         int accumulatorXLen = circleHoughTransform->getAccumulatorXLen();
         int accumulatorYLen = circleHoughTransform->getAccumulatorYLen();
@@ -242,7 +251,11 @@ void window::open(QString & filePath) {
             for(int j = 0; j < accumulatorYLen; j++) {
                 for(int i = 0; i < accumulatorXLen; i++) {
                     if(filteredImageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i] > 0) {
-                        filteredAccumulatorImages[r].setPixel(i, j, qRgb(filteredImageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i], 0, 0));
+                        int color = imageMatrix[r * accumulatorXLen * accumulatorYLen + j * accumulatorXLen + i] * 15 + 30;
+                        if(color > 255) {
+                            color = 255;
+                        }
+                        filteredAccumulatorImages[r].setPixel(i, j, qRgb(color, 0, 0));
                     } else {
                         filteredAccumulatorImages[r].setPixel(i, j, qRgb(0, 0, 0));
                     }
